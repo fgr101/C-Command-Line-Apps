@@ -19,6 +19,7 @@ void AskForInformation();
 void Save();
 void Load();
 void FileExists();
+void DeleteData();
 
 #ifdef _WIN32
 	
@@ -43,16 +44,23 @@ int main () {
 	Options = 0;
 	ClearScreen();
 	
-	printf ("Wallet Compare 0.1 \n\n");
+	printf ("Wallet Compare 0.1 \n");
+	printf ("====== ======= === \n\n");
 	
-	printf("\n %.2f", BRLtoUSDT[0]);
-	printf("\n %.2f", BRLtoUSDT[1]);
-	printf("\n %.2f", BRLtoUSDT[2]);
-	printf("\n %.2f", BRLtoUSDT[3]);
+	i = 0;
 	
-	printf("\n\n1- Bank 1 \n");
-	printf("2- Bank 2 \n");
-	printf("3- Bank 3 \n\n");
+	for (i = 0; i < MAX_STORAGE; i++) {
+		
+		printf("\n\n App %d --> Pays each USD: BRL $%.3f", i + 1, BRLtoUSDT[i]);
+		printf("\n App %d --> Pays each BRL: USD $%.3f", i + 1, USDTtoBRL[i]);
+		
+	}
+	
+	printf("\n\n1- Input Values for App 1 \n");
+	printf("2- Input Values for App 2 \n");
+	printf("3- Input Values for App 3 \n");
+	printf("6- Delete Data File \n");
+	printf("7- Exit \n\n");
 	
 	scanf("%d", &Options);
 
@@ -60,20 +68,32 @@ int main () {
 	
 		case 1:
 			
-			BankID = 1;
+			BankID = 0;
 			AskForInformation();
 			break;
 		
 		case 2:
 		
-			BankID = 2;
+			BankID = 1;
 			AskForInformation();
 			break;
 			
 		case 3:
 		
-			BankID = 3;
+			BankID = 2;
 			AskForInformation();
+			break;
+			
+		case 6:
+		
+			DeleteData();
+			break;
+		
+		case 7:
+		
+			Save();
+			printf("\nEnding...");
+			return 0;
 			break;
 					
 		default:
@@ -83,7 +103,7 @@ int main () {
 			
 	}
 		
-
+goto main;
 return 0;
 
 }
@@ -140,8 +160,13 @@ void Save() {
 	}
 		
 	//Guarda las variable en el archivo...
-	fprintf(FilePointer, "%f", BRLtoUSDT[BankID]);
-	fprintf(FilePointer, "%f", USDTtoBRL[BankID]);
+		
+	for (i = 0; i <= MAX_STORAGE; i++) {
+		
+		fprintf(FilePointer, "%f", BRLtoUSDT[i]);
+		fprintf(FilePointer, "%f", USDTtoBRL[i]);
+		
+	}
 	    
 	//Cierra el archivo...
 	fclose(FilePointer);
@@ -161,7 +186,6 @@ void Load() {
 			
 	} 
 			
-	i = 0;
 	
 	//Carga las variable desde el archivo...
 	for (i = 0; i <= MAX_STORAGE; i++) {
@@ -171,8 +195,8 @@ void Load() {
 		
 	}
 	
+	fclose(FilePointer);		
 	return;
-	//fclose(FilePointer);		
 
 }
 
@@ -213,6 +237,33 @@ void FileExists() {
 	fclose(FilePointer);
 
 	//==================================================================
+	
+}
+
+void DeleteData() {
+
+for (i = 0; i <= MAX_STORAGE; i++) {
+		
+	BRLtoUSDT[i] = 0;
+	USDTtoBRL[i] = 0;
+		
+}
+	
+printf("\nRemoving file...");
+
+#ifdef _WIN32
+    
+    // Windows
+    system("del compare.dat");
+
+#else
+    
+    // Unix-like systems
+    system("rm compare.dat");
+
+#endif
+
+printf("\nRemoving file OK...");
 	
 }
 
