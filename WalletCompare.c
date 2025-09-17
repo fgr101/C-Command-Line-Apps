@@ -10,7 +10,12 @@ float RecibidoUSDT[3];
 float BRLtoUSDT[3];
 float USDTtoBRL[3];
 int MAX_STORAGE = 3;
+
+int MaxValue;
 int i;
+
+int MaxValue;
+int BestApp;
 
 FILE *FilePointer; // Declares the file pointer globally
 
@@ -20,6 +25,10 @@ void Save();
 void Load();
 void FileExists();
 void DeleteData();
+void Reports();
+void WaitKey();
+
+char input;
 
 #ifdef _WIN32
 	
@@ -59,6 +68,7 @@ int main () {
 	printf("\n\n1- Input Values for App 1 \n");
 	printf("2- Input Values for App 2 \n");
 	printf("3- Input Values for App 3 \n");
+	printf("5- Reports\n");
 	printf("6- Delete Data File \n");
 	printf("7- Exit \n\n");
 	
@@ -82,6 +92,12 @@ int main () {
 		
 			BankID = 2;
 			AskForInformation();
+			break;
+			
+		case 5:
+		
+			Reports();
+			goto main;
 			break;
 			
 		case 6:
@@ -161,6 +177,8 @@ void Save() {
 		
 	//Guarda las variable en el archivo...
 		
+	int i;
+	
 	for (i = 0; i <= MAX_STORAGE; i++) {
 		
 		fprintf(FilePointer, "%f", BRLtoUSDT[i]);
@@ -184,10 +202,12 @@ void Load() {
 			
 		printf("Error opening file!\n");
 			
-	} 
-			
+	} 			
 	
 	//Carga las variable desde el archivo...
+	
+	int i;
+	
 	for (i = 0; i <= MAX_STORAGE; i++) {
 		
 		fscanf(FilePointer, "%f", &BRLtoUSDT[i]);
@@ -242,6 +262,8 @@ void FileExists() {
 
 void DeleteData() {
 
+int i;
+
 for (i = 0; i <= MAX_STORAGE; i++) {
 		
 	BRLtoUSDT[i] = 0;
@@ -267,14 +289,51 @@ printf("\nRemoving file OK...");
 	
 }
 
+void Reports() {
+	
+	int i;
+	
+	for (i = 0; i < 3; i++) {
+		
+		if (USDTtoBRL[i] > MaxValue) {
+			
+			MaxValue = USDTtoBRL[i];
+			BestApp = (i + 1);
+		
+		}
+	
+	}
+	
+	printf("\n The best app is number %d \n\n", BestApp);
+	WaitKey();
+	
+	
+	
+}
 
+void WaitKey() {
+	
+	// Loop until a key is pressed
+			
+	do {
+			
+		input = getchar();
+		
+	} while (input == '\n'); // Ignore newline characters
 
+	//printf("\n Key '%c' pressed. Program continues...\n", input);
 
+	return;
+
+}
 
 
 // NOTES
 // =====
 
+//* Arreglar BUG de que los datos no quedan bien guardados.
+//  se borran los valores.
+
 //* Arreglar BUG de salvar datos, variables no cargan correctamente.
-//* Que las variables queden guardadas en el programita.
- 
+//* Que las variables queden guardadas en el programa.
+
