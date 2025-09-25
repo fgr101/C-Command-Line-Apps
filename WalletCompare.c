@@ -106,7 +106,7 @@ int main () {
 			break;
 		
 		case 7:
-		
+			
 			Save();
 			printf("\nEnding...");
 			return 0;
@@ -177,14 +177,26 @@ void Save() {
 		
 	//Guarda las variable en el archivo...
 		
-	int i;
 	
-	for (i = 0; i <= MAX_STORAGE; i++) {
+	
+		fprintf(FilePointer, "%f\n", BRLtoUSDT[0]);
+		fprintf(FilePointer, "%f\n", BRLtoUSDT[1]);
+		fprintf(FilePointer, "%f\n", BRLtoUSDT[2]);
+		fprintf(FilePointer, "%f\n", BRLtoUSDT[3]);
 		
-		fprintf(FilePointer, "%f", BRLtoUSDT[i]);
-		fprintf(FilePointer, "%f", USDTtoBRL[i]);
+		fprintf(FilePointer, "%f\n", USDTtoBRL[0]);
+		fprintf(FilePointer, "%f\n", USDTtoBRL[1]);
+		fprintf(FilePointer, "%f\n", USDTtoBRL[2]);		
+		fprintf(FilePointer, "%f\n", USDTtoBRL[3]);
 		
-	}
+	//int i;
+			
+	//for (i = 0; i <= MAX_STORAGE; i++) {
+		
+		//fprintf(FilePointer, "%f", BRLtoUSDT[i]);
+		//fprintf(FilePointer, "%f", USDTtoBRL[i]);
+		
+	//}
 	    
 	//Cierra el archivo...
 	fclose(FilePointer);
@@ -206,17 +218,27 @@ void Load() {
 	
 	//Carga las variable desde el archivo...
 	
-	int i;
+	fscanf(FilePointer, "%f\n", &BRLtoUSDT[0]);
+	fscanf(FilePointer, "%f\n", &BRLtoUSDT[1]);
+	fscanf(FilePointer, "%f\n", &BRLtoUSDT[2]);
+	fscanf(FilePointer, "%f\n", &BRLtoUSDT[3]);
+		
+	fscanf(FilePointer, "%f\n", &USDTtoBRL[0]);
+	fscanf(FilePointer, "%f\n", &USDTtoBRL[1]);
+	fscanf(FilePointer, "%f\n", &USDTtoBRL[2]);		
+	fscanf(FilePointer, "%f\n", &USDTtoBRL[3]);
 	
-	for (i = 0; i <= MAX_STORAGE; i++) {
+	//int i;
+	
+	//for (i = 0; i <= MAX_STORAGE; i++) {
 		
-		fscanf(FilePointer, "%f", &BRLtoUSDT[i]);
-		fscanf(FilePointer, "%f", &USDTtoBRL[i]);
+		//fscanf(FilePointer, "%f", &BRLtoUSDT[i]);
+		//fscanf(FilePointer, "%f", &USDTtoBRL[i]);
 		
-	}
+	//}
 	
 	fclose(FilePointer);		
-	return;
+	//return;
 
 }
 
@@ -304,16 +326,18 @@ void Reports() {
 	
 	}
 	
-	printf("\n The best app is number %d \n\n", BestApp);
+	printf("\nThe best app is number %d. It gives you USDT $%.2f for each BRL.\n", BestApp, USDTtoBRL[BestApp - 1]);
+	printf("The exchange rate for each USDT is 1 USDT = R$%.2f BRL.\n\n", BRLtoUSDT[BestApp - 1]);
+	
 	WaitKey();
-	
-	
 	
 }
 
 void WaitKey() {
 	
 	// Loop until a key is pressed
+	
+	printf("\n- Input any number to continue >> ");
 			
 	do {
 			
@@ -327,13 +351,21 @@ void WaitKey() {
 
 }
 
-
 // NOTES
 // =====
 
-//* Arreglar BUG de que los datos no quedan bien guardados.
-//  se borran los valores.
+// Que tengas que escribir 1235 para confirmar y poder borrar todas las 
+// variable en la opción 6.
 
-//* Arreglar BUG de salvar datos, variables no cargan correctamente.
-//* Que las variables queden guardadas en el programa.
+// Que se le pueda agregar los nombres a la app, por ejemplo BELO, 
+// TAKENOS, etc.
 
+// =====================================================================
+
+// DONE
+// ====
+
+// V.0.1
+
+//* Arreglar BUG de datos que no quedan bien guardados, se borran los 
+// valores. Variables no cargan correctamente. [OK] 100%
