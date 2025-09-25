@@ -5,16 +5,14 @@
 int BankID;
 int Options;
 
-float RecibidoReales[3];
-float RecibidoUSDT[3];
-float BRLtoUSDT[3];
-float USDTtoBRL[3];
-int MAX_STORAGE = 3;
+float RecibidoReales[4];
+float RecibidoUSDT[4];
+float BRLtoUSDT[4];
+float USDTtoBRL[4];
+int MAX_STORAGE = 4;
 
-int MaxValue;
 int i;
-
-int MaxValue;
+float MaxValue;
 int BestApp;
 
 FILE *FilePointer; // Declares the file pointer globally
@@ -60,14 +58,15 @@ int main () {
 	
 	for (i = 0; i < MAX_STORAGE; i++) {
 		
-		printf("\n\n App %d --> Pays each USD: BRL $%.3f", i + 1, BRLtoUSDT[i]);
-		printf("\n App %d --> Pays each BRL: USD $%.3f", i + 1, USDTtoBRL[i]);
+		printf("\n\n App %d --> Pays each USD: BRL $%.3f", i, BRLtoUSDT[i]);
+		printf("\n App %d --> Pays each BRL: USD $%.3f", i, USDTtoBRL[i]);
 		
 	}
 	
 	printf("\n\n1- Input Values for App 1 \n");
 	printf("2- Input Values for App 2 \n");
 	printf("3- Input Values for App 3 \n");
+	printf("4- Input Values for App 4 \n");
 	printf("5- Reports\n");
 	printf("6- Delete Data File \n");
 	printf("7- Exit \n\n");
@@ -91,6 +90,12 @@ int main () {
 		case 3:
 		
 			BankID = 2;
+			AskForInformation();
+			break;
+			
+		case 4:
+		
+			BankID = 3;
 			AskForInformation();
 			break;
 			
@@ -120,6 +125,7 @@ int main () {
 	}
 		
 goto main;
+printf("RETURN 0");
 return 0;
 
 }
@@ -313,21 +319,24 @@ printf("\nRemoving file OK...");
 
 void Reports() {
 	
-	int i;
+	// Initialize MaxValue and BestApp
 	
-	for (i = 0; i < 3; i++) {
+	MaxValue = -1.00; // Use a sentinel value that cannot be exceeded by valid data like BRLtoUSDT[i]
+	BestApp = -1;  // Indicates no best app yet
+	
+	for (i = 0; i < MAX_STORAGE; i++) {
 		
 		if (USDTtoBRL[i] > MaxValue) {
 			
 			MaxValue = USDTtoBRL[i];
-			BestApp = (i + 1);
+			BestApp = i;
 		
 		}
 	
 	}
 	
-	printf("\nThe best app is number %d. It gives you USDT $%.2f for each BRL.\n", BestApp, USDTtoBRL[BestApp - 1]);
-	printf("The exchange rate for each USDT is 1 USDT = R$%.2f BRL.\n\n", BRLtoUSDT[BestApp - 1]);
+	printf("\nThe best app is number %d. It gives you USDT $%.3f for each BRL.\n", BestApp, USDTtoBRL[BestApp]);
+	printf("The exchange rate for each USDT is 1 USDT = R$%.2f BRL.\n\n", BRLtoUSDT[BestApp]);
 	
 	WaitKey();
 	
