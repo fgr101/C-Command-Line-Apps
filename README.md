@@ -2,7 +2,7 @@
 
 ## Wallet Comparison Program (WalletCompare.c)
 
-This is a C program that allows users to input exchange rates between Brazilian Real (BRL) and Tether (USDT) for up to 4 different banking/fintech apps. The program then generates a report showing the app that offers the best exchange rate.
+*This is a C program that allows users to input exchange rates between Brazilian Real (BRL) and Tether (USDT) for up to 4 different banking/fintech apps. The program then generates a report showing the app that offers the best exchange rate.*
 
 **Key features:**
 
