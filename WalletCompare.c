@@ -46,29 +46,39 @@ int main () {
 	Load(); //Loads variables from the file...
 	printf("Ok...");
 
-	//system("dir /w");
-	
 	main:
 	
 	Options = 0;
 	ClearScreen();
 	
 	printf ("Wallet Compare 0.1 \n");
-	printf ("====== ======= === \n\n");
+	printf ("====== ======= === \n");
 	
 	i = 0;
 	
 	for (i = 0; i < MAX_STORAGE; i++) {
 		
-		printf("\n\n App %d | %s --> Pays each USD: BRL $%.3f", i, BankName[i], BRLtoUSDT[i]);
+		printf("\n App %d | %s --> Pays each USD: BRL $%.3f", i, BankName[i], BRLtoUSDT[i]);
 		printf("\n App %d --> Pays each BRL: USD $%.3f", i, USDTtoBRL[i]);
 		
 	}
 	
-	printf("\n\n1- Input Values for App 1 \n");
-	printf("2- Input Values for App 2 \n");
-	printf("3- Input Values for App 3 \n");
-	printf("4- Input Values for App 4 \n");
+	printf("\n\n"); // Printing bank names in the menu.
+	
+	for (i = 0; i < 4; i++) { 
+	
+		if (BankName[i] != 0) {
+			
+			printf("%d- Input Values for %s\n", (i + 1), BankName[i]);
+		
+		} else { 
+			
+			printf("%d- Input Values for App %d \n", (i + 1), i);
+			
+		}
+	
+	}
+
 	printf("5- Reports\n");
 	printf("6- Delete Data File \n");
 	printf("7- Exit \n\n");
@@ -109,9 +119,25 @@ int main () {
 			
 		case 6:
 		
-			DeleteData();
+			Options = 0;
+			printf ("\n Input 1235 to confirm the action >> "); 
+			scanf ("%d", &Options);
+				
+			if (Options == 1235) {
+					
+				DeleteData();
+				printf("\nAll variables and data file have been succesfully deleted!");
+				WaitKey();
+				break;
+				
+			} else {
+				
+				printf("\nThe input wasn't 1235 so the action has been cancelled...");
+				WaitKey();
+			}
+			
 			break;
-		
+
 		case 7:
 			
 			Save();
@@ -127,7 +153,6 @@ int main () {
 	}
 		
 goto main;
-printf("RETURN 0");
 return 0;
 
 }
@@ -208,15 +233,6 @@ void Save() {
 		fprintf(FilePointer, "%f\n", USDTtoBRL[1]);
 		fprintf(FilePointer, "%f\n", USDTtoBRL[2]);		
 		fprintf(FilePointer, "%f\n", USDTtoBRL[3]);
-		
-	//int i;
-			
-	//for (i = 0; i <= MAX_STORAGE; i++) {
-		
-		//fprintf(FilePointer, "%f", BRLtoUSDT[i]);
-		//fprintf(FilePointer, "%f", USDTtoBRL[i]);
-		
-	//}
 	    
 	//Cierra el archivo...
 	fclose(FilePointer);
@@ -252,18 +268,8 @@ void Load() {
 	fscanf(FilePointer, "%f\n", &USDTtoBRL[1]);
 	fscanf(FilePointer, "%f\n", &USDTtoBRL[2]);		
 	fscanf(FilePointer, "%f\n", &USDTtoBRL[3]);
-	
-	//int i;
-	
-	//for (i = 0; i <= MAX_STORAGE; i++) {
 		
-		//fscanf(FilePointer, "%f", &BRLtoUSDT[i]);
-		//fscanf(FilePointer, "%f", &USDTtoBRL[i]);
-		
-	//}
-	
-	fclose(FilePointer);		
-	//return;
+	fclose(FilePointer);
 
 }
 
@@ -309,30 +315,30 @@ void FileExists() {
 
 void DeleteData() {
 
-int i;
+	int i;
 
-for (i = 0; i <= MAX_STORAGE; i++) {
+	for (i = 0; i <= MAX_STORAGE; i++) {
+			
+		BRLtoUSDT[i] = 0;
+		USDTtoBRL[i] = 0;
+		strcpy(BankName[i], "");
+	}
 		
-	BRLtoUSDT[i] = 0;
-	USDTtoBRL[i] = 0;
-	strcpy(BankName[i], "");
-}
-	
-printf("\nRemoving file...");
+	printf("\nRemoving file...");
 
-#ifdef _WIN32
-    
-    // Windows
-    system("del compare.dat");
+	#ifdef _WIN32
+		
+		// Windows
+		system("del compare.dat");
 
-#else
-    
-    // Unix-like systems
-    system("rm compare.dat");
+	#else
+		
+		// Unix-like systems
+		system("rm compare.dat");
 
-#endif
+	#endif
 
-printf("\nRemoving file OK...");
+	printf("\nRemoving file OK...");
 	
 }
 
@@ -365,15 +371,13 @@ void WaitKey() {
 	
 	// Loop until a key is pressed
 	
-	printf("\n- Input any number to continue >> ");
+	printf("\nInput any number to continue >> ");
 			
 	do {
 			
 		input = getchar();
 		
 	} while (input == '\n'); // Ignore newline characters
-
-	//printf("\n Key '%c' pressed. Program continues...\n", input);
 
 	return;
 
@@ -382,11 +386,8 @@ void WaitKey() {
 // NOTES
 // =====
 
-// Que tengas que escribir 1235 para confirmar y poder borrar todas las 
-// variable en la opción 6.
+// Que también calcule el interest que cobran cada una de las aplicaciones.
 
-// Que se le pueda agregar los nombres a la app, por ejemplo BELO, 
-// TAKENOS, etc.
 
 // =====================================================================
 
@@ -394,6 +395,13 @@ void WaitKey() {
 // ====
 
 // V.0.1
+// -----
+
+// Hay que escribir 1235 para confirmar y poder borrar todas las 
+// variable en la opción 6. [OK] 100%
+
+// Se puede agregar los nombres de las apps, por ejemplo BELO, 
+// TAKENOS, etc. [OK] 100%
 
 //* Arreglar BUG de datos que no quedan bien guardados, se borran los 
 // valores. Variables no cargan correctamente. [OK] 100%
