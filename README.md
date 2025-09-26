@@ -4,7 +4,7 @@
 
 This is a C program that allows users to input exchange rates between Brazilian Real (BRL) and Tether (USDT) for up to 4 different banking/fintech apps. The program then generates a report showing the app that offers the best exchange rate.
 
-Key features:
+**Key features:**
 
 Allows users to input the app name, BRL received, and USDT received for up to 4 apps
 Calculates the BRL to USDT and USDT to BRL exchange rates for each app
