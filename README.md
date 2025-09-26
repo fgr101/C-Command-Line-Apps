@@ -1,4 +1,4 @@
-* WalletCompare.c - Wallet Comparison Program
+** * WalletCompare.c - Wallet Comparison Program **
 
 ## Wallet Comparison Program (WalletCompare.c)
 
