@@ -13,6 +13,7 @@ char BankName[4][20];
 int MAX_STORAGE = 4;
 
 int i;
+int f;
 float MaxValue;
 int BestApp;
 
@@ -58,30 +59,31 @@ int main () {
 	
 	for (i = 0; i < MAX_STORAGE; i++) {
 		
-		printf("\n App %d | %s --> Pays each USD: BRL $%.3f", i, BankName[i], BRLtoUSDT[i]);
-		printf("\n App %d --> Pays each BRL: USD $%.3f", i, USDTtoBRL[i]);
+		printf("\n App %d | %s --> Pays each USD: BRL $%.3f", i + 1, BankName[i], BRLtoUSDT[i]);
+		printf(" | Pays each BRL: USD $%.3f", USDTtoBRL[i]);
 		
 	}
 	
 	printf("\n\n"); // Printing bank names in the menu.
 	
-	for (i = 0; i < 4; i++) { 
+	for (i = 0; i < MAX_STORAGE; i++) { 
 	
-		if (BankName[i] != 0) {
+		if (BankName[i][20] != '\0') { // --> '\0' se usa para representar un caracter vacio. [PASAR AL CUADERNO] 
 			
-			printf("%d- Input Values for %s\n", (i + 1), BankName[i]);
+			printf("%d- Input Values for %s\n", i + 1, BankName[i]);
 		
 		} else { 
 			
-			printf("%d- Input Values for App %d \n", (i + 1), i);
+			f = i + 1;
+			printf("%d- Input Values for App %d \n", f, i + 1);
 			
 		}
 	
 	}
 
-	printf("5- Reports\n");
+	printf("\n5- Reports\n");
 	printf("6- Delete Data File \n");
-	printf("7- Exit \n\n");
+	printf("77- Exit \n\n");
 	
 	scanf("%d", &Options);
 
@@ -138,7 +140,7 @@ int main () {
 			
 			break;
 
-		case 7:
+		case 77:
 			
 			Save();
 			printf("\nEnding...");
@@ -180,12 +182,11 @@ void AskForInformation() {
 	
 	printf("App, FinTech or Bank Name:\n");
 	scanf("%20s", UserInput);
-
+	
 	strcpy(BankName[BankID], UserInput);
+	
 	printf("The ID to be stored is %s. \n", BankName[BankID]);
-	
-
-	
+		
 	printf ("Cantidad de REALES: ");
 	scanf("%f", &RecibidoReales[BankID]);
 		
@@ -222,17 +223,20 @@ void Save() {
 		fprintf(FilePointer, "%20s\n", BankName[1]);
 		fprintf(FilePointer, "%20s\n", BankName[2]);
 		fprintf(FilePointer, "%20s\n", BankName[3]);
+		fprintf(FilePointer, "%20s\n", BankName[4]);
 
 	
 		fprintf(FilePointer, "%f\n", BRLtoUSDT[0]);
 		fprintf(FilePointer, "%f\n", BRLtoUSDT[1]);
 		fprintf(FilePointer, "%f\n", BRLtoUSDT[2]);
 		fprintf(FilePointer, "%f\n", BRLtoUSDT[3]);
+		fprintf(FilePointer, "%f\n", BRLtoUSDT[4]);
 		
 		fprintf(FilePointer, "%f\n", USDTtoBRL[0]);
 		fprintf(FilePointer, "%f\n", USDTtoBRL[1]);
 		fprintf(FilePointer, "%f\n", USDTtoBRL[2]);		
 		fprintf(FilePointer, "%f\n", USDTtoBRL[3]);
+		fprintf(FilePointer, "%f\n", USDTtoBRL[4]);
 	    
 	//Cierra el archivo...
 	fclose(FilePointer);
@@ -258,16 +262,19 @@ void Load() {
 	fscanf(FilePointer, "%20s\n", &BankName[1]);
 	fscanf(FilePointer, "%20s\n", &BankName[2]);
 	fscanf(FilePointer, "%20s\n", &BankName[3]);
+	fscanf(FilePointer, "%20s\n", &BankName[4]);
 	
 	fscanf(FilePointer, "%f\n", &BRLtoUSDT[0]);
 	fscanf(FilePointer, "%f\n", &BRLtoUSDT[1]);
 	fscanf(FilePointer, "%f\n", &BRLtoUSDT[2]);
 	fscanf(FilePointer, "%f\n", &BRLtoUSDT[3]);
+	fscanf(FilePointer, "%f\n", &BRLtoUSDT[4]);
 		
 	fscanf(FilePointer, "%f\n", &USDTtoBRL[0]);
 	fscanf(FilePointer, "%f\n", &USDTtoBRL[1]);
 	fscanf(FilePointer, "%f\n", &USDTtoBRL[2]);		
 	fscanf(FilePointer, "%f\n", &USDTtoBRL[3]);
+	fscanf(FilePointer, "%f\n", &USDTtoBRL[4]);
 		
 	fclose(FilePointer);
 
@@ -315,8 +322,6 @@ void FileExists() {
 
 void DeleteData() {
 
-	int i;
-
 	for (i = 0; i <= MAX_STORAGE; i++) {
 			
 		BRLtoUSDT[i] = 0;
@@ -360,7 +365,7 @@ void Reports() {
 	
 	}
 	
-	printf("\nThe best app is number %d, %s. It gives you USDT $%.3f for each BRL.\n", BestApp, BankName[BestApp], USDTtoBRL[BestApp]);
+	printf("\nThe best app is number %d, %s. It gives you USDT $%.3f for each BRL.\n", BestApp + 1, BankName[BestApp], USDTtoBRL[BestApp]);
 	printf("The exchange rate for each USDT is 1 USDT = R$%.2f BRL.\n\n", BRLtoUSDT[BestApp]);
 	
 	WaitKey();
