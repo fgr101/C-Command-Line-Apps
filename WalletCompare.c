@@ -9,6 +9,9 @@ float RecibidoReales[4];
 float RecibidoUSDT[4];
 float BRLtoUSDT[4];
 float USDTtoBRL[4];
+float FeePercent[4]; //NEW
+float Calculate[4];
+
 char BankName[4][20];
 int MAX_STORAGE = 4;
 
@@ -27,6 +30,7 @@ void FileExists();
 void DeleteData();
 void Reports();
 void WaitKey();
+void CalculateBest();
 
 char input;
 char UserInput[10];
@@ -61,6 +65,7 @@ int main () {
 		
 		printf("\n App %d | %s --> Pays each USD: BRL $%.3f", i + 1, BankName[i], BRLtoUSDT[i]);
 		printf(" | Pays each BRL: USD $%.3f", USDTtoBRL[i]);
+		printf(" | Transaction Fee: %.1f %c", FeePercent[i], '%');
 		
 	}
 	
@@ -186,6 +191,9 @@ void AskForInformation() {
 	strcpy(BankName[BankID], UserInput);
 	
 	printf("The ID to be stored is %s. \n", BankName[BankID]);
+	
+	printf ("\n Are there any fees for the transaction? Add the percentage: \n");
+	scanf("%f", &FeePercent[BankID]);
 		
 	printf ("Cantidad de REALES: ");
 	scanf("%f", &RecibidoReales[BankID]);
@@ -237,6 +245,12 @@ void Save() {
 		fprintf(FilePointer, "%f\n", USDTtoBRL[2]);		
 		fprintf(FilePointer, "%f\n", USDTtoBRL[3]);
 		fprintf(FilePointer, "%f\n", USDTtoBRL[4]);
+		
+		fprintf(FilePointer, "%f\n", FeePercent[0]);
+		fprintf(FilePointer, "%f\n", FeePercent[1]);
+		fprintf(FilePointer, "%f\n", FeePercent[2]);
+		fprintf(FilePointer, "%f\n", FeePercent[3]);
+		fprintf(FilePointer, "%f\n", FeePercent[4]);
 	    
 	//Cierra el archivo...
 	fclose(FilePointer);
@@ -275,6 +289,12 @@ void Load() {
 	fscanf(FilePointer, "%f\n", &USDTtoBRL[2]);		
 	fscanf(FilePointer, "%f\n", &USDTtoBRL[3]);
 	fscanf(FilePointer, "%f\n", &USDTtoBRL[4]);
+	
+	fscanf(FilePointer, "%f\n", &FeePercent[0]);
+	fscanf(FilePointer, "%f\n", &FeePercent[1]);
+	fscanf(FilePointer, "%f\n", &FeePercent[2]);		
+	fscanf(FilePointer, "%f\n", &FeePercent[3]);
+	fscanf(FilePointer, "%f\n", &FeePercent[4]);
 		
 	fclose(FilePointer);
 
@@ -327,6 +347,7 @@ void DeleteData() {
 		BRLtoUSDT[i] = 0;
 		USDTtoBRL[i] = 0;
 		strcpy(BankName[i], "");
+		FeePercent[i] = 0.000000;
 	}
 		
 	printf("\nRemoving file...");
@@ -370,6 +391,10 @@ void Reports() {
 	
 	WaitKey();
 	
+	CalculateBest();
+	
+	WaitKey();
+	
 }
 
 void WaitKey() {
@@ -386,6 +411,23 @@ void WaitKey() {
 
 	return;
 
+}
+
+void CalculateBest() {
+	
+	for ( i = 0; 1 < 4; i++) {
+		
+		float Percentage = (USDTtoBRL[i] * FeePercent[i]) / 100;
+		Calculate[i] = USDTtoBRL[i] - Percentage;
+		printf ("\n %s Fee: %2.f", BankName[i], Calculate[i]);
+		
+		
+	}
+	
+	
+	
+	
+	
 }
 
 // NOTES
