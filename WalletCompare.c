@@ -14,11 +14,15 @@ float Calculate[4];
 
 char BankName[4][20];
 int MAX_STORAGE = 4;
+int DeleteSwitch;
 
 int i;
 int f;
 float MaxValue;
 int BestApp;
+int WorstFee;
+
+float Percentage;
 
 FILE *FilePointer; // Declares the file pointer globally
 
@@ -135,6 +139,7 @@ int main () {
 				DeleteData();
 				printf("\nAll variables and data file have been succesfully deleted!");
 				WaitKey();
+				DeleteSwitch = 1;
 				break;
 				
 			} else {
@@ -147,7 +152,12 @@ int main () {
 
 		case 77:
 			
-			Save();
+			if (DeleteSwitch == 0) {
+				
+				Save();
+								
+			} else {printf ("\nSaving has been skipped...");}
+				
 			printf("\nEnding...");
 			return 0;
 			break;
@@ -185,20 +195,20 @@ void ClearScreen() {
 
 void AskForInformation() {
 	
-	printf("App, FinTech or Bank Name:\n");
+	printf("App, FinTech or Bank Name: ");
 	scanf("%20s", UserInput);
 	
 	strcpy(BankName[BankID], UserInput);
 	
-	printf("The ID to be stored is %s. \n", BankName[BankID]);
+	printf("* Name to be stored >> %s.\n", BankName[BankID]);
 	
-	printf ("\n Are there any fees for the transaction? Add the percentage: \n");
+	printf ("\nAre there any fees for the transaction? Input zero if there isn't any. \n* Add the percentage please: ");
 	scanf("%f", &FeePercent[BankID]);
 		
-	printf ("Cantidad de REALES: ");
+	printf ("\n\nCantidad de REALES: ");
 	scanf("%f", &RecibidoReales[BankID]);
 		
-	printf ("Valor recibido en USDT: ");
+	printf ("\n\nValor recibido en USDT: ");
 	scanf ("%f", &RecibidoUSDT[BankID]);
 
 	BRLtoUSDT[BankID] = RecibidoReales[BankID] / RecibidoUSDT[BankID];  
@@ -213,10 +223,10 @@ void AskForInformation() {
 	
 void Save() {
 
-	printf("Saving...");
+	printf("\nSaving...");
 		
 	//Abre y crea el POINTER hacia el archivo para escribir en él.
-	FilePointer = fopen("compare.dat", "w+");
+	FilePointer = fopen("compare.dat", "w");
 		
 	// Si el archivo da error...
 	if (FilePointer == NULL){
@@ -232,7 +242,6 @@ void Save() {
 		fprintf(FilePointer, "%20s\n", BankName[2]);
 		fprintf(FilePointer, "%20s\n", BankName[3]);
 		fprintf(FilePointer, "%20s\n", BankName[4]);
-
 	
 		fprintf(FilePointer, "%f\n", BRLtoUSDT[0]);
 		fprintf(FilePointer, "%f\n", BRLtoUSDT[1]);
@@ -347,7 +356,7 @@ void DeleteData() {
 		BRLtoUSDT[i] = 0;
 		USDTtoBRL[i] = 0;
 		strcpy(BankName[i], "");
-		FeePercent[i] = 0.000000;
+		FeePercent[i] = 0;
 	}
 		
 	printf("\nRemoving file...");
@@ -387,9 +396,7 @@ void Reports() {
 	}
 	
 	printf("\nThe best app is number %d, %s. It gives you USDT $%.3f for each BRL.\n", BestApp + 1, BankName[BestApp], USDTtoBRL[BestApp]);
-	printf("The exchange rate for each USDT is 1 USDT = R$%.2f BRL.\n\n", BRLtoUSDT[BestApp]);
-	
-	WaitKey();
+	printf("The exchange rate for each USDT is 1 USDT = R$%.2f BRL.\n", BRLtoUSDT[BestApp]);
 	
 	CalculateBest();
 	
@@ -401,7 +408,7 @@ void WaitKey() {
 	
 	// Loop until a key is pressed
 	
-	printf("\nInput any number to continue >> ");
+	printf("\n\n Input any number to continue >> ");
 			
 	do {
 			
@@ -415,13 +422,33 @@ void WaitKey() {
 
 void CalculateBest() {
 	
-	for ( i = 0; 1 < 4; i++) {
+	// Calculatin Fees
+	
+	MaxValue = -1.00; // Use a sentinel value that cannot be exceeded by valid data like BRLtoUSDT[i]
+	WorstFee = -1;  // Indicates no best app yet
+	
+	for (i = 0; i < MAX_STORAGE; i++) {
 		
-		float Percentage = (USDTtoBRL[i] * FeePercent[i]) / 100;
+		if (FeePercent[i] > MaxValue) {
+			
+			MaxValue = FeePercent[i];
+			WorstFee = i;
+		
+		}
+	
+	}
+	
+	printf ("\nThe app with the highest fee is %s with a %2.f %c charge. It's not recommended to use.\n", BankName[WorstFee], MaxValue, '%' );
+	
+	
+	
+	for ( i = 0; i < MAX_STORAGE; i++) {
+		
+		Percentage = (USDTtoBRL[i] * FeePercent[i]) / 100;
 		Calculate[i] = USDTtoBRL[i] - Percentage;
-		printf ("\n %s Fee: %2.f", BankName[i], Calculate[i]);
-		
-		
+		printf("\n %d - ", i + 1);
+		printf ("%s Fee: %3.f", BankName[i], Calculate[i]);
+				
 	}
 	
 	
