@@ -10,6 +10,9 @@ float RecibidoUSDT[4];
 float BRLtoUSDT[4];
 float USDTtoBRL[4];
 float FeePercent[4]; //NEW
+
+float ValueFeeSubstract[4];
+
 float Calculate[4];
 
 char BankName[4][20];
@@ -440,17 +443,29 @@ void CalculateBest() {
 	
 	printf ("\nThe app with the highest fee is %s with a %2.f %c charge. It's not recommended to use.\n", BankName[WorstFee], MaxValue, '%' );
 	
+	// Initialize MaxValue and BestApp
 	
-	
+	MaxValue = -1.00; // Use a sentinel value that cannot be exceeded by valid data like BRLtoUSDT[i]
+	BestApp = -1;  // Indicates no best app yet
+
 	for ( i = 0; i < MAX_STORAGE; i++) {
 		
 		Percentage = (USDTtoBRL[i] * FeePercent[i]) / 100;
-		Calculate[i] = USDTtoBRL[i] - Percentage;
-		printf("\n %d - ", i + 1);
-		printf ("%s Fee: %3.f", BankName[i], Calculate[i]);
+		ValueFeeSubstract[i] = USDTtoBRL[i] - Percentage;  
+		
+		printf("\n%d - 1 USDT = %f BRL - El porcentaje de %2.f %c de %s es %f >> ", i + 1, USDTtoBRL[i], FeePercent[i], '%', BankName[i], Percentage);
+		printf("You get %f BRL for each USD.", ValueFeeSubstract[i]);
+			
+		if (ValueFeeSubstract[i] > MaxValue) {
+			
+			MaxValue = ValueFeeSubstract[i];
+			BestApp = i;
+		
+		}
 				
 	}
 	
+	printf ("\n\nBest app or bank after the fee discount is %s.\nIt pays you BRL $ %f for each USD.", BankName[BestApp], MaxValue);
 	
 	
 	
