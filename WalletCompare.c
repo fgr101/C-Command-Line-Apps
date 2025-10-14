@@ -22,7 +22,8 @@ int DeleteSwitch;
 int i;
 int f;
 float MaxValue;
-int BestApp;
+int BestApp = -1;
+int WorstFeeApp = -1;
 int WorstFee;
 
 float Percentage;
@@ -37,7 +38,8 @@ void FileExists();
 void DeleteData();
 void Reports();
 void WaitKey();
-void CalculateBest();
+void CalculateFee();
+void ACalculateBestApp();
 
 char input;
 char UserInput[10];
@@ -48,7 +50,7 @@ char UserInput[10];
 
 #endif
 
-int main () {
+int main() {
 	
 	printf("Checking if file exists...");
 	FileExists(); //Checks if file exists...
@@ -73,6 +75,18 @@ int main () {
 		printf("\n App %d | %s --> Pays each USD: BRL $%.3f", i + 1, BankName[i], BRLtoUSDT[i]);
 		printf(" | Pays each BRL: USD $%.3f", USDTtoBRL[i]);
 		printf(" | Transaction Fee: %.1f %c", FeePercent[i], '%');
+		
+		if (i == BestApp) {
+			
+			printf(" | BEST APP");
+			
+		}
+		
+		if (i == WorstFeeApp && FeePercent[i] != 0) {
+			
+			printf(" | WORST FEE");
+			
+		}
 		
 	}
 	
@@ -220,7 +234,7 @@ void AskForInformation() {
 	USDTtoBRL[BankID] = RecibidoUSDT[BankID] / RecibidoReales[BankID];  
 	printf("\n Te pagan cada REAL en USDT: USDT $%.2f", USDTtoBRL[BankID]);
 	
-	Save();
+	ACalculateBestApp();
 	
 	}
 	
@@ -263,7 +277,11 @@ void Save() {
 		fprintf(FilePointer, "%f\n", FeePercent[2]);
 		fprintf(FilePointer, "%f\n", FeePercent[3]);
 		fprintf(FilePointer, "%f\n", FeePercent[4]);
-	    
+		
+		fprintf(FilePointer, "%d\n", BestApp);
+		fprintf(FilePointer, "%d\n", WorstFeeApp);
+
+			    
 	//Cierra el archivo...
 	fclose(FilePointer);
 			
@@ -307,6 +325,9 @@ void Load() {
 	fscanf(FilePointer, "%f\n", &FeePercent[2]);		
 	fscanf(FilePointer, "%f\n", &FeePercent[3]);
 	fscanf(FilePointer, "%f\n", &FeePercent[4]);
+	
+	fscanf(FilePointer, "%d\n", &BestApp);
+	fscanf(FilePointer, "%d\n", &WorstFeeApp);
 		
 	fclose(FilePointer);
 
@@ -360,6 +381,8 @@ void DeleteData() {
 		USDTtoBRL[i] = 0;
 		strcpy(BankName[i], "");
 		FeePercent[i] = 0;
+		BestApp = -1;
+		WorstFeeApp = -1;
 	}
 		
 	printf("\nRemoving file...");
@@ -384,25 +407,28 @@ void Reports() {
 	
 	// Initialize MaxValue and BestApp
 	
-	MaxValue = -1.00; // Use a sentinel value that cannot be exceeded by valid data like BRLtoUSDT[i]
-	BestApp = -1;  // Indicates no best app yet
+	//MaxValue = -1.00; // Use a sentinel value that cannot be exceeded by valid data like BRLtoUSDT[i]
+	//BestApp = -1;  // Indicates no best app yet
 	
-	for (i = 0; i < MAX_STORAGE; i++) {
+	//for (i = 0; i < MAX_STORAGE; i++) {
 		
-		if (USDTtoBRL[i] > MaxValue) {
+		//if (USDTtoBRL[i] > MaxValue) {
 			
-			MaxValue = USDTtoBRL[i];
-			BestApp = i;
+			//MaxValue = USDTtoBRL[i];
+			//BestApp = i;
 		
-		}
+		//}
 	
-	}
+	//}
+	
+	ACalculateBestApp();
 	
 	printf("\nThe best app is number %d, %s. It gives you USDT $%.3f for each BRL.\n", BestApp + 1, BankName[BestApp], USDTtoBRL[BestApp]);
 	printf("The exchange rate for each USDT is 1 USDT = R$%.2f BRL.\n", BRLtoUSDT[BestApp]);
 	
-	CalculateBest();
+	printf ("\nThe app with the highest fee is %s with a %2.f %c charge. It's not recommended to use.\n", BankName[WorstFee], MaxValue, '%' );
 	
+	//CalculateFee();
 	WaitKey();
 	
 }
@@ -423,7 +449,7 @@ void WaitKey() {
 
 }
 
-void CalculateBest() {
+void CalculateFee() {
 	
 	// Calculatin Fees
 	
@@ -446,7 +472,7 @@ void CalculateBest() {
 	// Initialize MaxValue and BestApp
 	
 	MaxValue = -1.00; // Use a sentinel value that cannot be exceeded by valid data like BRLtoUSDT[i]
-	BestApp = -1;  // Indicates no best app yet
+	WorstFeeApp = -1;  // Indicates no best app yet
 
 	for ( i = 0; i < MAX_STORAGE; i++) {
 		
@@ -459,7 +485,7 @@ void CalculateBest() {
 		if (ValueFeeSubstract[i] > MaxValue) {
 			
 			MaxValue = ValueFeeSubstract[i];
-			BestApp = i;
+			WorstFeeApp = i;
 		
 		}
 				
@@ -469,6 +495,44 @@ void CalculateBest() {
 	
 	
 	
+	
+}
+
+void ACalculateBestApp() {
+		
+	// Initialize MaxValue and BestApp
+	
+	MaxValue = -1.00; // Use a sentinel value that cannot be exceeded by valid data like BRLtoUSDT[i]
+	BestApp = -1;  // Indicates no best app yet
+	
+	for (i = 0; i < MAX_STORAGE; i++) {
+		
+		if (USDTtoBRL[i] > MaxValue) {
+			
+			MaxValue = USDTtoBRL[i];
+			BestApp = i;
+		
+		}
+	
+	}
+	
+	// Calculate worst Fee
+	
+	MaxValue = -1.00; // Use a sentinel value that cannot be exceeded by valid data like BRLtoUSDT[i]
+	WorstFee = -1;  // Indicates no best app yet
+	
+	for (i = 0; i < MAX_STORAGE; i++) {
+		
+		if (FeePercent[i] > MaxValue) {
+			
+			MaxValue = FeePercent[i];
+			WorstFeeApp = i;
+		
+		}
+	
+	}
+
+	Save();
 	
 }
 
