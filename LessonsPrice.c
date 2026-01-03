@@ -126,7 +126,7 @@ int main() {
 	
 	printf("\n\n");
 	printf(".===================================.\n");
-	printf("|  Monthly Payment Calculator 0.6   |\n");
+	printf("|  Monthly Payment Calculator 0.7   |\n");
 	printf(".===================================.\n");
 	printf("|                                   |\n");
 	printf("| [1] Generate Payment              |\n");
@@ -148,7 +148,7 @@ int main() {
 		
 			//SHOW MONTHLY PAYMENTS
 			ShowPayments();
-			return 0;
+			goto ProgramIni;
 			break;
 			
 		case 3:
@@ -405,7 +405,7 @@ int main() {
 								
 				if (ApplyDiscount == 1) {
 					
-					printf(" --> with the %.0f percent discount it would be: %.2f - %.2f = *R$%.2f*.", DiscountValue, MonthPayment, Discount, PaymentWithDiscount);
+					printf(" --> with the %.0f percent discount it would be: %.2f - %.2f = :receipt *R$%.2f*.", DiscountValue, MonthPayment, Discount, PaymentWithDiscount);
 				
 				}
 				
@@ -423,7 +423,7 @@ int main() {
 				
 				if (ApplyDiscount == 1) {
 					
-					printf("--> con el %.0f porciento de descuento quedaria: %.2f - %.2f = *R$%.2f*.", DiscountValue, MonthPayment, Discount, PaymentWithDiscount);
+					printf("--> con el %.0f porciento de descuento quedaria: %.2f - %.2f = :receipt *R$%.2f*.", DiscountValue, MonthPayment, Discount, PaymentWithDiscount);
 				
 				}
 			
@@ -441,7 +441,7 @@ int main() {
 				
 				if (ApplyDiscount == 1) {
 					
-					printf("--> com o %.0f porcento de desconto ficaria: %.2f - %.2f = *R$%.2f*.", DiscountValue, MonthPayment, Discount, PaymentWithDiscount);
+					printf("--> com o %.0f porcento de desconto ficaria: %.2f - %.2f = :receipt *R$%.2f*.", DiscountValue, MonthPayment, Discount, PaymentWithDiscount);
 				
 				}
 				
@@ -507,8 +507,8 @@ void NewEntryFile() {
 	time_t now = time(NULL); 
     struct tm *local = localtime(&now);
 
-    strftime(s, sizeof(s), "%d-%m-%Y ||", local);
-    
+    strftime(s, sizeof(s), "%d-%m-%Y", local);
+        
 	//==================================================================
     //SHOW THE RIGHT CURRENCY FOR EACH ENTRY: ARS, BRL, USD.
     
@@ -534,7 +534,7 @@ void NewEntryFile() {
 	//==================================================================
     // Write variables to the file
 
-    fprintf(fptr, "* %s %s [%s] %s $%.2f\n", s, StudentName, Month, CurrencyLetters, TotalValue);
+    fprintf(fptr, "* %s || Lessons: %2.f || %s [%s] %s $%.2f\n", s, HoursNumber, StudentName, Month, CurrencyLetters, TotalValue);
      
 	fclose(fptr);
 	
@@ -737,20 +737,20 @@ void ArgMarket() {
 			
 		case 1:
 			
-			printf("%s, this month (%s) there are %.0f classes. _%.0f * %.2f = $%.2f_", StudentName, Month, HoursNumber, HoursNumber, Price, MonthPayment);
+			printf("%s, this month (%s) there are %.0f classes. _%.0f * %.2f = :receipt *R$%.$%.2f*_", StudentName, Month, HoursNumber, HoursNumber, Price, MonthPayment);
 				
 			break;		
 					
 		
 		case 2: 
 						
-			printf("%s, este mes (%s) son %.0f clases. _%.0f * %.2f = $%.2f_", StudentName, Month, HoursNumber, HoursNumber, Price, MonthPayment);
+			printf("%s, este mes (%s) son %.0f clases. _%.0f * %.2f = :receipt *R$%.$%.2f*_", StudentName, Month, HoursNumber, HoursNumber, Price, MonthPayment);
 				
 			break;
 			
 		case 3:
 				
-			printf("%s, esse mes (%s) sao %.0f aulas. _%.0f * %.2f = $%.2f_", StudentName, Month, HoursNumber, HoursNumber, Price, MonthPayment);
+			printf("%s, esse mes (%s) sao %.0f aulas. _%.0f * %.2f = :receipt *R$%.$%.2f*_", StudentName, Month, HoursNumber, HoursNumber, Price, MonthPayment);
 			
 			break;
 				
@@ -792,20 +792,20 @@ void USAMarket() {
 			
 		case 1:
 			
-			printf("%s, this month (%s) we'll have %.0f classes. _%.0f * %.2f = USD $%.2f_", StudentName, Month, HoursNumber, HoursNumber, Price, MonthPayment);
+			printf("%s, this month (%s) we'll have %.0f classes. _%.0f * %.2f = :receipt *USD $%.2f*_", StudentName, Month, HoursNumber, HoursNumber, Price, MonthPayment);
 				
 			break;		
 					
 		
 		case 2: 
 						
-			printf("%s, este mes (%s) vamos a tener %.0f clases. _%.0f * %.2f = USD $%.2f_", StudentName, Month, HoursNumber, HoursNumber, Price, MonthPayment);
+			printf("%s, este mes (%s) vamos a tener %.0f clases. _%.0f * %.2f = :receipt *USD $%.2f*_", StudentName, Month, HoursNumber, HoursNumber, Price, MonthPayment);
 				
 			break;
 			
 		case 3:
 				
-			printf("%s, esse mes (%s) teremos %.0f aulas. _%.0f * %.2f = USD $%.2f_", StudentName, Month, HoursNumber, HoursNumber, Price, MonthPayment);
+			printf("%s, esse mes (%s) teremos %.0f aulas. _%.0f * %.2f = :receipt *USD $%.2f*_", StudentName, Month, HoursNumber, HoursNumber, Price, MonthPayment);
 			
 			break;
 				
@@ -873,14 +873,15 @@ void GeneratePayment() {
 	printf(" Generate receipt? [Y/N]: \n\n");
 	
 	printf("*.====================.*\n");
-	printf("*|  :receipt Payment Received   |*\n");
+	printf("*| Payment Received   |*\n");
 	printf("*.====================.*\n\n");
 	
 	printf("*Student Name:* %s \n", StudentName);
 	printf("*Month Paid:* %s \n", Month);
 	
-	if (Market == 1) { printf("*Total Price:* ARS $%.2f \n\n", TotalValue);}
-	if (Market == 2) { printf("*Total Price:* R$%.2f \n\n", TotalValue);}
+	if (Market == 1) { printf(":receipt *Total Price:* ARS $%.2f \n\n", TotalValue);}
+	if (Market == 2) { printf(":receipt *Total Price:* R$%.2f \n\n", TotalValue);}
+	if (Market == 3) { printf(":receipt *Total Price:* USD$%.2f \n\n", TotalValue);}
 	
 	printf("*.====================.*\n");
 
@@ -939,45 +940,42 @@ void TimeDifferenceSUB() {
 
 void ShowPayments() {
 	
-    FILE * FilePointer = fopen("Payments.txt", "r");
-    
-    // Reading the file data using fgets() in the
-    // form of a block of size 30 bytes
-    
-    // Muestra archivo de lista de pagos desde el principio.
-
-	char buff[50];
-	char ch;
 	ClearScreen();
-
-	do {
-		
-		for (i = 0; i <= 19 && ch != 0; i++) {
-		
-			fgets(buff, sizeof(buff), fptr);
-			printf("%s", buff);
-			
-			ch = fgetc(FilePointer);
-			printf("\n First character in the line: %c\n", ch);
-		
-		}
-		
-		printf ("\n Input [1] to continue...");
-		WaitKey();
-			
-	} while ((fgets(buff, sizeof(buff), FilePointer) != NULL));
-        
-    //--------------------------------
-    
-    //fseek(FilePointer, 0, SEEK_SET);
-
-	//char ch = fgetc(FilePointer);
 	
-	//if (ch != EOF) {
-       
-       //printf("\n First character in the file: %c\n", ch);
-   
-   //}
+	//fgets() allows the programmer to read a line of text from a file.
+	//fputs() allows the programmer to write a string to a file.
+	//Understanding these functions is useful for working with text-based files.
+	
+	FILE *fptr;
+    
+    char buffer[100]; // Buffer to hold each line (adjust size if lines are long)
+    
+    // 1. Open the file in read mode ("r")
+    fptr = fopen("payments.txt", "r");
+    
+    // 2. Check if the file opened successfully
+    if (fptr == NULL) {
+        printf("Error: Could not open file.\n");
+        return;
+    }
+    
+    printf("--- Monthly Payments Log ---\n\n");
+    
+    // 3. Read and print line by line
+    // fgets returns NULL when it reaches the end of the file
+    
+    while (fgets(buffer, sizeof(buffer), fptr) != NULL) {
+        
+        printf("%s", buffer);
+     		
+	}
+    
+    // 4. Always close the file when finished
+    fclose(fptr);
+    
+    printf("\n\n Input any value to continue >> ");
+    WaitKey();
+    return;
         
 }
 	
@@ -989,7 +987,7 @@ void ConfigMenu() {
 	
 	printf("\n\n");
 	printf(".==========================================.\n");
-	printf("|      Monthly Payment Calculator 0.6      |\n");
+	printf("|      Monthly Payment Calculator 0.7      |\n");
 	printf(".==========================================.\n");
 	printf("|                                          |\n");
 
@@ -1057,9 +1055,11 @@ void WaitKey() {
 // TO DO
 // =====
 
+//* Que se guarde en el archivo TXT si se aplica el descuento o no.
+
 //* Alerts for late or missed payments.
 
-//* Generating monthly or yearly summary reports of total payments, discounts 
+//* Generating monthly or yearly summary reports of total payments, discounts
 //  applied, and other key metrics.
 
 //* Providing filters to view payments by student, lesson type, market, 
@@ -1067,16 +1067,6 @@ void WaitKey() {
 
 //* Options for each students (country, single, group, old or new, etc.) 
 //  are saved in memory and automaticly loaded.
-
-//--------------------------------------------------------------------------
-
-//* Show 'payments.txt' entries in the program. Print entries on the screen.
-//  USE fgets() and fputs(): These functions are used to read and write 
-// strings to and from files, respectively.
-
-//fgets() allows the programmer to read a line of text from a file.
-//fputs() allows the programmer to write a string to a file.
-//Understanding these functions is useful for working with text-based files.
 
 //--------------------------------------------------------------------------
 
@@ -1091,6 +1081,11 @@ void WaitKey() {
 
 // DONE
 // ====
+
+// 0.7
+
+//* Que se guarde en el archivo TXT el número de clases.
+//* Show 'payments.txt' entries in the program.
 
 // 0.6
 
