@@ -23,9 +23,11 @@ void MenuServicios();
 void ServicesDeactivate();
 void RunCleanManager();
 void AboutLimpia();
+void AutoCleaning();
 
 char input;
 int opcion;
+int SwitchAuto;
 
 int main() {
 	
@@ -36,6 +38,7 @@ int main() {
 	
 	ShowMenuINI:
 	
+	SwitchAuto = 0;
 	ClearScreen();
 	ShowMenu();
 	
@@ -112,6 +115,13 @@ int main() {
 			break;
 		
 		case 12:
+		
+			SwitchAuto = 1;
+			AutoCleaning();
+			goto ShowMenuINI;
+			break;
+		
+		case 13:
 			
 			ClearScreen();
 			goto End;
@@ -146,7 +156,8 @@ void ShowMenu() {
 	printf("9. Desactivar servicios no esenciales\n");
 	printf("10. Abrir 'Limpiador de Disco' de Windows\n");
 	printf("11. Sobre Limpia C\n");
-    printf("12. Salir\n");
+    printf("12. Limpiar automaticamente el sistema. \n");
+    printf("13. Salir\n");
     
     printf("\n============================================\n");
     
@@ -270,7 +281,7 @@ void DelRecycleBin() {
 	
 	printf("\nLimpiando la papelera de reciclaje...\n");
     system("rd /s /q C:\\$Recycle.Bin");
-    printf("\nPapelera de reciclaje vacía.\n");
+    printf("\nPapelera de reciclaje vacia.\n");
     WaitKey();
     return;
 	
@@ -304,8 +315,30 @@ void KillTempFolder() {
 
 void UpdateWinget() {
 	
+	printf("\n* La opcion 'Actualizar paquetes con winget' actualizara los programas instalados en Windows\n");
+    printf("a su version mas reciente. Si usted no desea actualizar o no sabe como esto puede afectar\n");
+    printf("el uso cotidiano de sus aplicaciones por favor evite utilizar esta opcion.\n\n");
+	
+	printf("Seguro quiere actualizar aplicaciones y programas en su PC? Ingrese el numero [197] para\n");
+	printf("confirmar la accion. Cero [0] o cualquier otro numero para cancelar...\n\n");
+		
+	printf(">> ");
+	scanf("%d", &opcion);
+	
+	if (opcion != 197) {
+		
+		printf ("\n\nAccion cancelada...\n");		
+		return;
+		
+	} else { 
+		
+		printf ("\n\nAccion confirmada...\n");
+		
+	}
+	
     printf("\nActualizando paquetes con winget...\n");
-    system("winget upgrade --all");
+    system("winget upgrade --include-unknown");
+    system("winget upgrade --all --include-unknown");
     printf("\nActualización completada.\n");
     WaitKey();
     return;
@@ -316,9 +349,9 @@ void UpdateWinget() {
 
 void FlushDNS() {
 	
-    printf("Liberando la caché de DNS...\n");
+    printf("Liberando la cache de DNS...\n");
     system("ipconfig /flushdns");
-    printf("Caché de DNS liberada.\n");
+    printf("Cache de DNS liberada.\n");
     WaitKey();
     return;
     
@@ -328,12 +361,12 @@ void FlushDNS() {
 
 void CleanChrome() {
     
-    printf("Limpiando la caché de Google Chrome...\n");
+    printf("Limpiando la cache de Google Chrome...\n");
     system("rd /s /q \"%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\Cache\"");
     printf("LOCAL APP DATA >> Google Chrome >> Cache [BORRADO]\n");
     system("rd /s /q \"%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\Service Worker\\CacheStorage\"");
     printf("LOCAL APP DATA >> Google Chrome >> CacheStorage [BORRADO]\n");
-    printf("Caché de Google Chrome borrado.\n");
+    printf("Cache de Google Chrome borrado.\n");
     WaitKey();
     return;
 
@@ -341,9 +374,9 @@ void CleanChrome() {
 
 void CleanStreamio() {
     
-    printf("Limpiando la caché de Streamio...\n");
+    printf("Limpiando la cache de Streamio...\n");
     system("rd /s /q \"C:\\Users\\ferna\\AppData\\Roaming\\stremio\\stremio-server\\stremio-cache\"");
-    printf("Caché de Streamio limpio.\n");
+    printf("Cache de Streamio limpio.\n");
     WaitKey();
     return;
 
@@ -382,15 +415,19 @@ void WaitKey() {
 	
 	// Loop until a value is inserted
 	
-	printf("\nIngresa '0' (cero) para continuar >> ", input);
-			
-	do {
-			
-		input = getchar();
+	if (SwitchAuto != 1) {
 		
-	} while (input == '\n'); // Ignore newline characters
+		printf("\nIngresa '0' (cero) para continuar >> ", input);
+			
+		do {
+			
+			input = getchar();
+		
+		} while (input == '\n'); // Ignore newline characters
 
-	return;
+		return;
+	
+	}
 		
 }
 
@@ -419,3 +456,21 @@ void AboutLimpia() {
     return;
  
  }
+ 
+ void AutoCleaning() {
+	
+	ClearScreen();
+	 
+	printf("\nLimpiando el sistema automaticamente...\n");
+	
+	DelTempFiles();
+	DelRecycleBin();
+	FlushDNS();
+	CleanChrome();
+	
+	printf("Limpieza automatica finalizada...\n");
+	SwitchAuto = 0;
+		
+	WaitKey();
+
+}
