@@ -149,6 +149,7 @@ int main() {
 		default:
 		
 			printf("DEFAULT");
+			opcion = 0;
 			goto ShowMenuINI;
 	
 	}
@@ -185,7 +186,8 @@ void ShowMenu() {
  } 
 
 void MenuServicios() {
-	 
+	
+	DeactivateMenuINI: 
 	opcion = 0;
 	ClearScreen();
     
@@ -210,38 +212,45 @@ void MenuServicios() {
 	switch (opcion) {
 		
 		case 1:
-				
+			
+			ActionNumber = 101;	
 			ServicesDeactivate("DiagTrack"); // Telemetría
 			break;
 	
 		case 2:
 			
+			ActionNumber = 102;	
 			ServicesDeactivate("Fax");       // Fax
 			break;
 	
 		case 3:
 			
+			ActionNumber = 103;	
 			ServicesDeactivate("TapiSrv");   // Teléfono
 			ServicesDeactivate("PhoneSvc");
 			break;
 	
 		case 4:
 	
+			ActionNumber = 104;	
 			ServicesDeactivate("Spooler");   // Servicio de impresión
 			break;
 	
 		case 5:
-	
+			
+			ActionNumber = 105;	
 			ServicesDeactivate("Wsearch");   // Windows Search
 			break;
 			
 		case 6:
-		
+			
+			ActionNumber = 106;	
 			ServicesDeactivate("WbioSrvc");   // Biometria
 			break;
 			
 		case 7:
-		
+			
+			ActionNumber = 107;	
 			ServicesDeactivate("XblGameSave");   // Servicios de Xbox.
 			ServicesDeactivate("XboxNetApiSvc");
 			ServicesDeactivate("XboxGipSvc");
@@ -250,6 +259,7 @@ void MenuServicios() {
 			
 		case 8:
 			
+			ActionNumber = 108;	
 			ServicesDeactivate("GoogleUpdaterInternalService144.0.7547.0");   // Servicios de Google Update.
 			ServicesDeactivate("GoogleUpdaterService144.0.7547.0");
 			ServicesDeactivate("gupdate");
@@ -262,8 +272,9 @@ void MenuServicios() {
 			
 	}
     
+    NewEntryFile();
     WaitKey();
-    return;
+    goto DeactivateMenuINI;
  
  }
 
@@ -563,7 +574,7 @@ void NewEntryFile() {
 	
 	if (SwitchAuto != 1) {
 		
-		printf("\nAgregando entrada en el archivo 'registro.txt'...");
+		printf("\nAnotando modificaciones en 'registro.txt'...");
 	
 		switch (ActionNumber) {
 			
@@ -610,7 +621,47 @@ void NewEntryFile() {
 			case 12:
 		
 				strcpy (ActionText, "Limpieza automatica del sistema");
-				break;			
+				break;
+			
+			case 101: 
+
+    			strcpy (ActionText, "Desactivado Telemetria de Windows");
+    			break;
+			
+			case 102:
+			
+				strcpy (ActionText, "Desactivado Servicios de Fax");
+				break;
+			
+			case 103:
+				
+				strcpy (ActionText, "Desactivado Servicios de Telefonia");
+				break;
+				
+			case 104:
+			
+				strcpy (ActionText, "Desactivado Servicios de Impresora");
+				break;
+    
+			case 105:
+			
+				strcpy (ActionText, "Desactivado Servicios de Windows Search");
+				break;
+				
+			case 106:
+			
+				strcpy (ActionText, "Desactivado Servicios de Biometria");
+				break;
+				
+			case 107:
+			
+				strcpy (ActionText, "Desactivado Servicios de Xbox");
+				break;
+				
+			case 108:
+			
+				strcpy (ActionText, "Desactivado Servicios de Google Update");
+				break;
 			
 		}
 	
@@ -643,8 +694,6 @@ void NewEntryFile() {
 	return;
 	
 }
-
-Notas:
 
 //======================================================================
 //                               Notas 
