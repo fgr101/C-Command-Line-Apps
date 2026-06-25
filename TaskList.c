@@ -11,13 +11,21 @@
 #define MAX_STORAGE 20
 #define MAX_CHARACTERS 300
 
+// --- CONFIGURACIÓN CLOUDFLARE ---
+const char *CF_API_TOKEN = "##########################";
+const char *CF_ACCOUNT_ID = "########################";
+const char *CF_NAMESPACE_ID = "#####################";
+const char *CF_KEY_NAME = "#######################";
+
 FILE *fptr; // Declares the file pointer globally
 
 char TaskNote [MAX_STORAGE][MAX_CHARACTERS];
+int TaskStatus[MAX_STORAGE]; 
 
 int TaskNumber = 0;
 int Opcion = 0;
 char input;
+char UserInput0[50];
 
 //Functions
 
@@ -30,6 +38,9 @@ void FlushBuffer();
 void CheckFile();
 void SaveData();
 void Load();
+void MarkAsDone();
+void DeleteFiles();
+void DeleteAllTasks();
 
 int main() {
 		
@@ -37,7 +48,6 @@ int main() {
 		MainMenu();
 			
 	}
-	
 	
 void MainMenu() {
 	
@@ -49,7 +59,10 @@ void MainMenu() {
 		
 		printf("1. Add Task \n");
 		printf("2. Show Tasks \n");
-		printf("3. Exit \n\n");
+		printf("3. Mark as Done \n");
+		printf("4. Delete all Tasks \n");
+		printf("5. Delete Files \n");
+		printf("6. Exit \n\n");
 		
 		printf("Choose an option: ");
 		scanf("%d", &Opcion);
@@ -68,6 +81,21 @@ void MainMenu() {
 				break;
 			
 			case 3:
+			
+				MarkAsDone();
+				break;
+				
+			case 4:
+			
+				DeleteAllTasks();
+				break;
+				
+			case 5:
+			
+				DeleteFiles();
+				break;
+			
+			case 6:
 				
 				printf("Ending program...");
 				loop1 = 7;
@@ -103,7 +131,6 @@ void ClearScreen() {
 
 }
 	
-	
 void AddTask() {
 	
 	FlushBuffer();
@@ -112,6 +139,7 @@ void AddTask() {
 	// Lee hasta 100 caracteres o hasta el salto de línea
     fgets(TaskNote[TaskNumber], MAX_CHARACTERS, stdin);
     
+    TaskStatus[TaskNumber] = 0;
     TaskNumber ++;
     SaveData();
     return;
@@ -124,7 +152,15 @@ void PrintNotes() {
 	
 	for (int i = 0; i < MAX_STORAGE; i ++){
 		
-		printf("* %s", TaskNote[i]);	
+		if (TaskStatus[i] == 0) {printf("* %s", TaskNote[i]);}	
+	
+	}
+	
+	printf("\n\nTasks MARKED AS DONE: \n\n");
+	
+	for (int i = 0; i < MAX_STORAGE; i ++){
+		
+		if (TaskStatus[i] == 1) {printf("* %s", TaskNote[i]);}
 	
 	}
 	
@@ -234,7 +270,7 @@ void SaveData() {
     // Config variables
     //=================
     
-    //fprintf(fptr, "%d\n", TimeDifferenceMODE);
+    fprintf(fptr, "%d\n", TaskNumber);
     
     //printf("Config: Time Difference MODE [%d]\n", TimeDifferenceMODE);
     
@@ -285,12 +321,11 @@ void Load() {
     // Config variables
     //=================
 
-    //fscanf(fptr, "%d", &TimeDifferenceMODE);
+    fscanf(fptr, "%d", &TaskNumber);
     //printf("Config: Time Difference MODE loaded [%d]\n", TimeDifferenceMODE);
   
-  
-    //Values and Prices
-    //=================  
+    //Tasks, TO DO list.
+    //==================  
     
    	for (int i= 0; i < MAX_STORAGE; i++) { fgets(TaskNote[i], MAX_CHARACTERS, fptr);}
     
@@ -316,7 +351,113 @@ void Load() {
 	    
 }
 
+void MarkAsDone() {
+	
+	Opcion = 0;
+	printf("\n\n");
+	
+	for (int i = 0; i < MAX_STORAGE; i ++) {
+		
+		if (TaskStatus[i] == 0) {printf("[%d] %s", i, TaskNote[i]);}	
+	
+	}
+	
+	printf("\n\nWhat task do you want to mark as done and finished? >> ");
+	scanf("%d", &Opcion);
+	
+	if (Opcion <= MAX_STORAGE) {
+		
+		TaskStatus[Opcion] = 1; // STATUS 1 means DONE.
+		printf("Task %d marked as finished.", Opcion);
+				
+		}
+	
+	WaitKey();
+	return;
+	
+	}
+	
+void DeleteFiles() {
+	
+	printf("\n");
+	printf ("Are you sure you want to delete all DATA FILES? \n");
+	printf("Write YES to confirm the action: ");
+	scanf("%4s", &UserInput0);
+				
+	if (strcasecmp(UserInput0, "YES") == 0) {
+		
+		#ifdef _WIN32
+	
+			system("del TaskList.dat");
+
+		#else
+	
+			system("rm TaskList.dat");  // Comando para Linux/Unix/macOS
+
+		#endif
+		
+		for (int i = 0; i <= MAX_STORAGE; i++) { //BORRA TODAS LAS TAREAS QUE FUERON CARGADAS.
+			
+			strcpy(TaskNote[i], "");
+			TaskStatus[i] = 0;
+					
+		}
+		
+		printf("\n");
+		printf("All DATA FILES have been deleted. ");
+		printf("\n");
+			
+	} else {
+			
+		printf("\n"); 
+		printf("The action ha been canceled... ");
+			
+		}
+	
+	WaitKey();
+	return;
+	
+}
+
+void DeleteAllTasks() {
+		
+	printf("\n");
+	printf ("Are you sure you want to delete all the information stored? \n");
+	printf("Write YES to confirm the action: ");
+	scanf("%4s", &UserInput0);
+				
+	if (strcasecmp(UserInput0, "YES") == 0) {
+		
+		for (int i = 0; i <= MAX_STORAGE; i++) {
+			
+			strcpy(TaskNote[i], "");
+			TaskStatus[i] = 0;
+					
+		}
+		
+		printf("\n");
+		printf("All tasks have been deleted. ");
+		printf("\n");
+		
+	} else {
+			
+		printf("\n"); 
+		printf("The action ha been canceled... ");
+			
+		}
+	
+	WaitKey();
+	return;
+		
+}
+
+
 //NOTES
+
+//TO DO
+//=====
+
+//* Mark tasks as finished.
 
 // Version 0.1
 //============
@@ -325,3 +466,10 @@ void Load() {
 // * Print Notes function added.
 // * MAX_STORAGE and MAX_CHARACTERS constants added.
 // * Basic program structure created.
+// * Data File creation (CheckFile Function).
+// * Saving and Loading of text [tasks] and variables on SaveData and Load functions.
+// * Useful functions ClearScreen(), WaitKey(), FlushBuffer(), etc.
+//* Delete ALL tasks function added.
+//* Delete DATA FILE function added.
+
+
