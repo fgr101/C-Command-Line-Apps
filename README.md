@@ -11,7 +11,7 @@ Saves and loads user data to/from a file named "compare.dat".
 Includes utility functions like deleting stored data.
 This program can be a useful tool for users looking to compare exchange rates across different financial apps and identify the one that offers the best value.
 
-## C Task Manager (TaskManager.c)
+## C Task Manager (TaskList.c)
 
 This is a high-performance C program designed for efficient task management through a professional terminal-based interface. It utilizes advanced ANSI escape sequences to provide a structured, color-coded dashboard that helps users organize their daily activities with minimal resource consumption.
 
