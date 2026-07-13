@@ -11,16 +11,70 @@
 #define MAX_STORAGE 20
 #define MAX_CHARACTERS 300
 
+// Definimos los códigos ANSI como macros para poder usarlos como LOCATE.
+//=======================================================================
+
+#define CLEAR_SCREEN "\033[2J"
+#define RESET_CURSOR "\033[H"
+#define COLOR_RESET  "\033[0m"
+#define COLOR_BOLD   "\033[1m"
+#define COLOR_BLUE   "\033[34m"
+
+// Estilos
+
+#define RESET       "\033[0m"
+#define BOLD        "\033[1m"
+#define UNDERLINE   "\033[4m"
+
+// Colores Estándar
+
+#define BLACK       "\033[30m"
+#define RED         "\033[31m"
+#define GREEN       "\033[32m"
+#define YELLOW      "\033[33m"
+#define BLUE        "\033[34m"
+#define MAGENTA     "\033[35m"
+#define CYAN        "\033[36m"
+#define WHITE       "\033[37m"
+
+// Colores Brillantes (se ven mejor en muchas consolas modernas)
+
+#define B_BLACK     "\033[90m"
+#define B_RED       "\033[91m"
+#define B_GREEN     "\033[92m"
+#define B_YELLOW    "\033[93m"
+#define B_BLUE      "\033[94m"
+#define B_MAGENTA   "\033[95m"
+#define B_CYAN      "\033[96m"
+#define B_WHITE     "\033[97m"
+
+// Colores de fondo.....
+
+#define BG_BLACK    "\033[40m"
+#define BG_RED      "\033[41m"
+#define BG_GREEN    "\033[42m"
+#define BG_YELLOW   "\033[43m"
+#define BG_BLUE     "\033[44m"
+#define BG_MAGENTA  "\033[45m"
+#define BG_CYAN     "\033[46m"
+#define BG_WHITE    "\033[47m"
+
+//======================================================================
+
+void locate();
+void clean_screen();
+
 // --- CONFIGURACIÓN CLOUDFLARE ---
-const char *CF_API_TOKEN = "##########################";
-const char *CF_ACCOUNT_ID = "########################";
-const char *CF_NAMESPACE_ID = "#####################";
-const char *CF_KEY_NAME = "#######################";
+//const char *CF_API_TOKEN = "##########################";
+//const char *CF_ACCOUNT_ID = "########################";
+//const char *CF_NAMESPACE_ID = "#####################";
+//const char *CF_KEY_NAME = "#######################";
 
 FILE *fptr; // Declares the file pointer globally
 
 char TaskNote [MAX_STORAGE][MAX_CHARACTERS];
-int TaskStatus[MAX_STORAGE]; 
+//int TaskStatus[MAX_STORAGE]; 
+unsigned char TaskStatus[MAX_STORAGE]; 
 
 int TaskNumber = 0;
 int Opcion = 0;
@@ -41,6 +95,7 @@ void Load();
 void MarkAsDone();
 void DeleteFiles();
 void DeleteAllTasks();
+void MarkAsPriority();
 
 int main() {
 		
@@ -55,16 +110,28 @@ void MainMenu() {
 	
 	do {
 		
-		ClearScreen();
+		clean_screen();
+
+		// Dibujamos una especie de interfaz
 		
-		printf("1. Add Task \n");
-		printf("2. Show Tasks \n");
-		printf("3. Mark as Done \n");
-		printf("4. Delete all Tasks \n");
-		printf("5. Delete Files \n");
-		printf("6. Exit \n\n");
+		locate(2, 1);
+		printf(COLOR_BOLD BG_GREEN WHITE "=== GESTOR DE TAREAS v0.2 ===" COLOR_RESET);
+	
+		//ClearScreen();
+
+		locate(1, 3);	
+		printf(BOLD GREEN "1. Add Task");
+		printf("\n2. Show Tasks");
+		printf("\n3. Mark as Done");
+		printf("\n4. Mark as a Priority");
+		printf("\n5. Delete all Tasks");
+		printf("\n6. Delete Files");
+		printf("\n7. Exit");
 		
-		printf("Choose an option: ");
+		PrintNotes();
+		
+		locate(1, 11);
+		printf(B_GREEN "Choose an option: ");
 		scanf("%d", &Opcion);
 		
 		switch (Opcion) {
@@ -84,21 +151,28 @@ void MainMenu() {
 			
 				MarkAsDone();
 				break;
-				
+			
 			case 4:
 			
-				DeleteAllTasks();
+				MarkAsPriority();
 				break;
 				
 			case 5:
 			
+				DeleteAllTasks();
+				break;
+				
+			case 6:
+			
 				DeleteFiles();
 				break;
 			
-			case 6:
+			case 7:
 				
 				printf("Ending program...");
+				printf(COLOR_RESET);	
 				loop1 = 7;
+				ClearScreen();
 				break;
 			
 			default:
@@ -117,17 +191,19 @@ void MainMenu() {
 
 void ClearScreen() {
 
-#ifdef _WIN32
+printf(CLEAR_SCREEN RESET_CURSOR);
+
+//#ifdef _WIN32
     
     // Windows
-    system("cls");
+//    system("cls");
 
-#else
+//#else
     
     // Unix-like systems
-    system("clear");
+//    system("clear");
 
-#endif
+//#endif
 
 }
 	
@@ -148,19 +224,75 @@ void AddTask() {
 	
 void PrintNotes() {
 	
-	printf("\n\n");
+	int LinesAdded = 0;
+	
+	printf(RESET_CURSOR);	
+	locate (40, 1);
+			
+	printf(BG_RED WHITE "DO THIS FIRST:");
+	printf(COLOR_RESET);
 	
 	for (int i = 0; i < MAX_STORAGE; i ++){
+
+		if (strcmp(TaskNote[i], "") != 0) {
+				
+			locate (40, (3 + LinesAdded));
+			
+			if (TaskStatus[i] == 2) {
+				
+				printf(WHITE "[!] %s", TaskNote[i]); 
+				LinesAdded ++;
+			
+			}	
 		
-		if (TaskStatus[i] == 0) {printf("* %s", TaskNote[i]);}	
+		}
 	
 	}
 	
-	printf("\n\nTasks MARKED AS DONE: \n\n");
+	LinesAdded = 0;
+	locate (40, 10);
+	
+	printf(BG_BLUE WHITE "OTHER GENERAL TASKS:\n");
+	printf(COLOR_RESET);
 	
 	for (int i = 0; i < MAX_STORAGE; i ++){
 		
-		if (TaskStatus[i] == 1) {printf("* %s", TaskNote[i]);}
+		if (strcmp(TaskNote[i], "") != 0) {
+			
+			locate (40, (12 + LinesAdded));
+			
+			if (TaskStatus[i] == 0) {
+				
+				printf(WHITE "* %s", TaskNote[i]);
+				LinesAdded ++;	
+			
+			}
+			
+		}
+	
+	}	
+	
+	LinesAdded = 0;
+	locate (40, 20);
+	
+	printf(BG_CYAN WHITE "DONE AND FINISHED:");
+	printf(COLOR_RESET);
+	
+	for (int i = 0; i < MAX_STORAGE; i ++){
+		
+		if (strcmp(TaskNote[i], "") != 0) {
+
+			locate (40, (22 + LinesAdded));
+			
+			if (TaskStatus[i] == 1) {
+				
+				printf(WHITE "[OK] %s", TaskNote[i]);
+				LinesAdded++;
+			
+			
+			}
+		
+		}
 	
 	}
 	
@@ -276,7 +408,9 @@ void SaveData() {
     
     //Values and Prices
     //=================
-	
+
+	for (int i= 0; i < MAX_STORAGE; i++) {fprintf(fptr, "%u ", TaskStatus[i]);}
+	fprintf(fptr, "\n"); // <--- para que las tareas empiecen en una línea nueva	
 	for (int i= 0; i < MAX_STORAGE; i++) {fprintf(fptr, "%s", TaskNote[i]);}
     
     //fprintf(fptr, "%f\n", GroupLessonPrice);
@@ -326,8 +460,13 @@ void Load() {
   
     //Tasks, TO DO list.
     //==================  
-    
-   	for (int i= 0; i < MAX_STORAGE; i++) { fgets(TaskNote[i], MAX_CHARACTERS, fptr);}
+
+   	for (int i= 0; i < MAX_STORAGE; i++) {fscanf(fptr, "%hhu", &TaskStatus[i]);} 
+   	
+   	// FGETC(FPTR): Consume el último espacio o salto de línea que dejó el fscanf.
+   	fgetc(fptr);
+   	   		
+   	for (int i= 0; i < MAX_STORAGE; i++) {fgets(TaskNote[i], MAX_CHARACTERS, fptr);}
     
     //fscanf(fptr, "%f", &SingleLessonPrice);
     //fscanf(fptr, "%f", &GroupLessonPrice);
@@ -356,11 +495,34 @@ void MarkAsDone() {
 	Opcion = 0;
 	printf("\n\n");
 	
-	for (int i = 0; i < MAX_STORAGE; i ++) {
+	printf("\n\nDO THIS FIRST: \n\n");
+	
+	for (int i = 0; i < MAX_STORAGE; i ++){
 		
-		if (TaskStatus[i] == 0) {printf("[%d] %s", i, TaskNote[i]);}	
+		if (strcmp(TaskNote[i], "") != 0) {
+			
+			if (TaskStatus[i] == 2) {printf("[%d] %s", i, TaskNote[i]);}
+			
+		}
 	
 	}
+
+	printf("\n\nOTHER GENERAL TASKS:");
+	
+	for (int i = 0; i < MAX_STORAGE; i ++){
+		
+		if (strcmp(TaskNote[i], "") != 0) {
+			
+			if (TaskStatus[i] == 0) {printf("[%d] %s", i, TaskNote[i]);}	
+		}
+		
+	}
+	
+	//for (int i = 0; i < MAX_STORAGE; i ++) {
+		
+	//	if (TaskStatus[i] == 0 || TaskStatus[i] == 2) {printf("[%d] %s", i, TaskNote[i]);}	
+	
+	//}
 	
 	printf("\n\nWhat task do you want to mark as done and finished? >> ");
 	scanf("%d", &Opcion);
@@ -372,6 +534,7 @@ void MarkAsDone() {
 				
 		}
 	
+	SaveData();
 	WaitKey();
 	return;
 	
@@ -396,7 +559,7 @@ void DeleteFiles() {
 
 		#endif
 		
-		for (int i = 0; i <= MAX_STORAGE; i++) { //BORRA TODAS LAS TAREAS QUE FUERON CARGADAS.
+		for (int i = 0; i < MAX_STORAGE; i++) { //BORRA TODAS LAS TAREAS QUE FUERON CARGADAS.
 			
 			strcpy(TaskNote[i], "");
 			TaskStatus[i] = 0;
@@ -415,6 +578,8 @@ void DeleteFiles() {
 		}
 	
 	WaitKey();
+	CheckFile();
+	
 	return;
 	
 }
@@ -428,7 +593,7 @@ void DeleteAllTasks() {
 				
 	if (strcasecmp(UserInput0, "YES") == 0) {
 		
-		for (int i = 0; i <= MAX_STORAGE; i++) {
+		for (int i = 0; i < MAX_STORAGE; i++) {
 			
 			strcpy(TaskNote[i], "");
 			TaskStatus[i] = 0;
@@ -451,25 +616,84 @@ void DeleteAllTasks() {
 		
 }
 
+void MarkAsPriority() {
+	
+	Opcion = 0;
+	printf("\n\n");
+	
+	for (int i = 0; i < MAX_STORAGE; i ++) {
+		
+		if (TaskStatus[i] == 0) {printf("[%d] %s", i, TaskNote[i]);}	
+	
+	}
+	
+	printf("\n\nWhat task do you want to mark as A PRIORITY? >> ");
+	scanf("%d", &Opcion);
+	
+	if (Opcion <= MAX_STORAGE) {
+		
+		TaskStatus[Opcion] = 2; // STATUS 2 means PRIORITY.
+		printf("Task %d marked as important and a priority.", Opcion);
+		
+		}
+	
+	SaveData();
+	WaitKey();
+	return;
+	
+	}
+	
+// Nuestra función LOCATE multiplataforma
+// Nota: En ANSI es (Fila, Columna)
+
+void locate(int x, int y) {
+	
+    printf("\033[%d;%dH", y, x);
+
+}
+
+void clean_screen() {
+	
+    printf(CLEAR_SCREEN);
+    printf(RESET_CURSOR);
+    
+}
 
 //NOTES
 
 //TO DO
 //=====
 
-//* Mark tasks as finished.
+
+
+//======================================================================
+
+// Version 0.2
+//============
+
+// * Optimized Memory: Switched TaskStatus from 'int' to 'unsigned char' (75% RAM savings per status).
+// * Processing Efficiency: Removed system() calls, replaced with direct ANSI escape sequences for instant UI rendering.
+// * Robust Persistence: Implemented safe loading with '%hhu' and manual buffer clearing (fgetc) to prevent data corruption.
+// * Enhanced Data Structure: Added space-separated saving to ensure reliable data parsing during file loading.
+// * Memory Safety: Fixed array boundary conditions (Off-by-one errors) in all deletion and clearing functions.
+// * Advanced ANSI UI: Added a full suite of macros for professional colors (B_RED, BG_GREEN, etc.) and styles (BOLD, UNDERLINE).
+// * Visual Categorization: Tasks are now dynamically filtered into three distinct blocks: "PRIORITY", "GENERAL", and "DONE".
+// * Non-Linear Rendering: Utilized coordinate-based positioning (locate function) to create a multi-column dashboard layout.
+// * Visual Feedback System: Implemented status-specific prefixes ([!], *, [OK]) and color coding for better task tracking.
+// * Cross-Platform Compatibility: Fully portable terminal handling for modern Windows, Linux, and macOS environments.
 
 // Version 0.1
 //============
 
-//* Add Task function added.
+// * Add Task function added.
 // * Print Notes function added.
 // * MAX_STORAGE and MAX_CHARACTERS constants added.
 // * Basic program structure created.
 // * Data File creation (CheckFile Function).
 // * Saving and Loading of text [tasks] and variables on SaveData and Load functions.
 // * Useful functions ClearScreen(), WaitKey(), FlushBuffer(), etc.
-//* Delete ALL tasks function added.
-//* Delete DATA FILE function added.
+// * Delete ALL tasks function added.
+// * Delete DATA FILE function added.
+// * Mark tasks as finished.
 
 
