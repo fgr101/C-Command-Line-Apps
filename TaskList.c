@@ -86,6 +86,7 @@ char UserInput0[50];
 void AddTask();
 void PrintNotes();
 void MainMenu();
+void PrintLeftMenu();
 void ClearScreen();
 void WaitKey();
 void FlushBuffer();
@@ -213,13 +214,18 @@ void AddTask() {
 	printf("Task: ");
 	
 	// Lee hasta 100 caracteres o hasta el salto de línea
-    fgets(TaskNote[TaskNumber], MAX_CHARACTERS, stdin);
+	fgets(TaskNote[TaskNumber], MAX_CHARACTERS, stdin);
+
+	if (strcmp(TaskNote[TaskNumber], "") != 0) {
     
-    TaskStatus[TaskNumber] = 0;
-    TaskNumber ++;
-    SaveData();
-    return;
+		TaskStatus[TaskNumber] = 0;
+		TaskNumber ++;
+		SaveData();
+    
+	}
 	
+    return;
+		
 	}
 	
 void PrintNotes() {
@@ -252,7 +258,7 @@ void PrintNotes() {
 	LinesAdded = 0;
 	locate (40, 10);
 	
-	printf(BG_BLUE WHITE "OTHER GENERAL TASKS:\n");
+	printf(BG_BLUE WHITE "OTHER GENERAL TASKS:");
 	printf(COLOR_RESET);
 	
 	for (int i = 0; i < MAX_STORAGE; i ++){
@@ -492,28 +498,54 @@ void Load() {
 
 void MarkAsDone() {
 	
-	Opcion = 0;
-	printf("\n\n");
+	ClearScreen();
+	PrintLeftMenu();
 	
-	printf("\n\nDO THIS FIRST: \n\n");
+	int LinesAdded = 0;	
+	printf(RESET_CURSOR);	
+	
+	Opcion = 0;
+	
+	locate (40, 1);
+	printf(BG_RED WHITE "DO THIS FIRST:");
+	printf(COLOR_RESET);
 	
 	for (int i = 0; i < MAX_STORAGE; i ++){
 		
 		if (strcmp(TaskNote[i], "") != 0) {
 			
-			if (TaskStatus[i] == 2) {printf("[%d] %s", i, TaskNote[i]);}
+			locate (40, (3 + LinesAdded));
+			
+			if (TaskStatus[i] == 2) {
+				
+				printf(WHITE "[%d] %s", i, TaskNote[i]);
+				LinesAdded ++;
+				
+			}
 			
 		}
 	
 	}
-
-	printf("\n\nOTHER GENERAL TASKS:");
+	
+	LinesAdded = 0;
+	
+	locate (40, 10);
+	printf(BG_BLUE WHITE "OTHER GENERAL TASKS:");
+	printf(COLOR_RESET);
 	
 	for (int i = 0; i < MAX_STORAGE; i ++){
 		
 		if (strcmp(TaskNote[i], "") != 0) {
 			
-			if (TaskStatus[i] == 0) {printf("[%d] %s", i, TaskNote[i]);}	
+			locate (40, (12 + LinesAdded));
+			
+			if (TaskStatus[i] == 0) {
+				
+				printf(WHITE "[%d] %s", i, TaskNote[i]);
+				LinesAdded++;
+				
+				}	
+		
 		}
 		
 	}
@@ -524,7 +556,8 @@ void MarkAsDone() {
 	
 	//}
 	
-	printf("\n\nWhat task do you want to mark as done and finished? >> ");
+	locate (40, (15 + LinesAdded));
+	printf("Write task number >> ");
 	scanf("%d", &Opcion);
 	
 	if (Opcion <= MAX_STORAGE) {
@@ -535,7 +568,7 @@ void MarkAsDone() {
 		}
 	
 	SaveData();
-	WaitKey();
+	//WaitKey();
 	return;
 	
 	}
@@ -659,6 +692,29 @@ void clean_screen() {
     
 }
 
+void PrintLeftMenu() {
+	
+	clean_screen();
+
+	// Dibujamos una especie de interfaz
+		
+	locate(2, 1);
+	printf(COLOR_BOLD BG_GREEN WHITE "=== GESTOR DE TAREAS v0.2 ===" COLOR_RESET);
+	
+	//ClearScreen();
+
+	locate(1, 3);	
+	printf(BOLD GREEN "1. Add Task");
+	printf("\n2. Show Tasks");
+	printf("\n3. Mark as Done");
+	printf("\n4. Mark as a Priority");
+	printf("\n5. Delete all Tasks");
+	printf("\n6. Delete Files");
+	printf("\n7. Exit");
+	
+	
+	}
+	
 //NOTES
 
 //TO DO
