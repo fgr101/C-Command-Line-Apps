@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 #ifdef _WIN32
 
@@ -76,10 +77,12 @@ char TaskNote [MAX_STORAGE][MAX_CHARACTERS];
 //int TaskStatus[MAX_STORAGE]; 
 unsigned char TaskStatus[MAX_STORAGE]; 
 
+
 int TaskNumber = 0;
 int Opcion = 0;
 char input;
 char UserInput0[50];
+int Language = 0; // 0 English, 1 Spanish
 
 //Functions
 
@@ -98,12 +101,49 @@ void DeleteTask();
 void DeleteFiles();
 void DeleteAllTasks();
 void MarkAsPriority();
+void ShowDate();
 
 int main() {
 		
 		CheckFile();
 		MainMenu();
 			
+	}
+
+void ShowDate() {
+	
+	//https://www.w3schools.com/c/c_date_time.php
+	
+	time_t now = time(NULL);         // Get current time
+	struct tm *t = localtime(&now);  // Convert to local time structure
+	
+	locate (112, 1);
+	
+	switch (Language) {
+		
+		case 0:
+		
+			printf("%d/", t->tm_mon + 1);
+			printf("%d/", t->tm_mday);
+			printf("%d", t->tm_year + 1900);
+
+		case 1:
+
+			printf("%d/", t->tm_mday);		
+			printf("%d/", t->tm_mon + 1);
+			printf("%d", t->tm_year + 1900);
+		
+	}
+	
+	//printf("Year: %d\n", t->tm_year + 1900);  // Add 1900 to get the actual year
+	//printf("Month: %d\n", t->tm_mon + 1);     // Months are numbered from 0 to 11, so add 1 to match real month numbers (1-12)
+	//printf("Day: %d\n", t->tm_mday);
+	//printf("Hour: %d\n", t->tm_hour);
+	//printf("Minute: %d\n", t->tm_min);
+	//printf("Second: %d\n", t->tm_sec);
+	
+	return; 
+		
 	}
 	
 void DeleteTask() {
@@ -291,11 +331,12 @@ void MainMenu() {
 	do {
 		
 		clean_screen();
+		ShowDate();
 
 		// Dibujamos una especie de interfaz
 		
 		locate(2, 1);
-		printf(COLOR_BOLD BG_GREEN WHITE "=== GESTOR DE TAREAS v0.2 ===" COLOR_RESET);
+		printf(COLOR_BOLD BG_GREEN WHITE "=== FG TaskList v0.2 ===" COLOR_RESET);
 	
 		//ClearScreen();
 
@@ -893,17 +934,23 @@ void PrintLeftMenu() {
 	
 	
 	}
-	
+
 //NOTES
 
 //TO DO
 //=====
 
+// - Agregar apartado "About Task List".
+// - Que se pueda poner el programa en español.
+// - Agregar apartado en donde se puedan ver los valores de las variables 
+//   del programa, en donde se vea la capacidad de memoria del sistema, cantidad de
+//   tareas guardadas, etc. 
+// - Agregar FECHA en la parte suoerior del programa.
 // - Agregar automaticamente fecha y hora a las tareas.
 // - Hacer una papelera de reciclage en donde se puedan almacenar tareas borradas.
 // - Que se pueda vaciar la papelera de reciclage.
 // - Que se puedan restaurar tareas de la papelera de reciclage.
-// - Avisar cuando se alcance el limite de almacenamiento de tareas.
+
 // - Extender limite de almacenamiento de tareas.
 // - Todavía hay un BUG en la carga de los datos.
 
@@ -911,6 +958,9 @@ void PrintLeftMenu() {
 
 // Version 0.2
 //============
+
+// - Nuevo nombre para el programa podría ser "FG TaskList".
+// * Avisar cuando se alcance el limite de almacenamiento de tareas. [OK]
 
 // * Optimized Memory: Switched TaskStatus from 'int' to 'unsigned char' (75% RAM savings per status).
 // * Processing Efficiency: Removed system() calls, replaced with direct ANSI escape sequences for instant UI rendering.
