@@ -94,6 +94,7 @@ void CheckFile();
 void SaveData();
 void Load();
 void MarkAsDone();
+void DeleteTask();
 void DeleteFiles();
 void DeleteAllTasks();
 void MarkAsPriority();
@@ -104,6 +105,184 @@ int main() {
 		MainMenu();
 			
 	}
+	
+void DeleteTask() {
+	
+	int LinesAdded = 1;
+	
+	printf(RESET_CURSOR);	
+	locate (40, LinesAdded);
+			
+	printf(BG_RED WHITE "DO THIS FIRST:");
+	printf(COLOR_RESET);
+	
+	LinesAdded = 3;
+	
+	for (int i = 0; i < MAX_STORAGE; i ++){
+
+		if (strcmp(TaskNote[i], "") != 0) {
+				
+			locate (40, (LinesAdded));
+			
+			if (TaskStatus[i] == 2) {
+				
+				printf(WHITE "[%d] %s", i, TaskNote[i]);
+				LinesAdded ++;
+			
+			}
+		
+		}
+	
+	}
+	
+	LinesAdded = LinesAdded + 2;
+	locate (40, LinesAdded);
+	
+	printf(BG_BLUE WHITE "OTHER GENERAL TASKS:");
+	printf(COLOR_RESET);
+	
+	LinesAdded = LinesAdded + 2;	
+	
+	for (int i = 0; i < MAX_STORAGE; i ++){
+		
+		if (strcmp(TaskNote[i], "") != 0) {
+			
+			locate (40, LinesAdded);
+			
+			if (TaskStatus[i] == 0) {
+				
+				printf(WHITE "[%d] %s", i, TaskNote[i]);
+				LinesAdded ++;	
+			
+			}
+			
+		}
+	
+	}	
+	
+	LinesAdded = LinesAdded + 2;
+	locate (40, LinesAdded);
+	
+	printf(BG_CYAN WHITE "DONE AND FINISHED:");
+	printf(COLOR_RESET);
+	
+	LinesAdded = LinesAdded + 2;
+	
+	for (int i = 0; i < MAX_STORAGE; i ++){
+		
+		if (strcmp(TaskNote[i], "") != 0) {
+
+			locate (40, LinesAdded);
+			
+			if (TaskStatus[i] == 1) {
+				
+				printf(WHITE "[%d] %s", i, TaskNote[i]);
+				LinesAdded++;
+			
+			}
+		
+		}
+	
+	}
+
+
+//======================================================================
+	
+//	int LinesAdded = 0;
+	
+//	printf(RESET_CURSOR);	
+//	locate (40, 1);
+			
+//	printf(BG_RED WHITE "DO THIS FIRST:");
+//	printf(COLOR_RESET);
+	
+//	for (int i = 0; i < MAX_STORAGE; i ++){
+
+//		if (strcmp(TaskNote[i], "") != 0) {
+				
+//			locate (40, (3 + LinesAdded));
+			
+//			if (TaskStatus[i] == 2) {
+				
+//				printf(WHITE "[%d] %s", i, TaskNote[i]);
+//				LinesAdded ++;
+			
+//			}	
+		
+//		}
+	
+//	}
+	
+//	LinesAdded = 0;
+//	locate (40, 10);
+//	
+//	printf(BG_BLUE WHITE "OTHER GENERAL TASKS:");
+//	printf(COLOR_RESET);
+	
+//	for (int i = 0; i < MAX_STORAGE; i ++){
+		
+//		if (strcmp(TaskNote[i], "") != 0) {
+			
+//			locate (40, (12 + LinesAdded));
+			
+//			if (TaskStatus[i] == 0) {
+				
+//				printf(WHITE "[%d] %s", i, TaskNote[i]);
+//				LinesAdded ++;	
+//			
+//			}
+			
+//		}
+	
+//	}	
+	
+//	LinesAdded = 0;
+//	locate (40, 20);
+	
+//	printf(BG_CYAN WHITE "DONE AND FINISHED:");
+//	printf(COLOR_RESET);
+	
+//	for (int i = 0; i < MAX_STORAGE; i ++){
+		
+//		if (strcmp(TaskNote[i], "") != 0) {
+
+//			locate (40, (22 + LinesAdded));
+			
+//			if (TaskStatus[i] == 1) {
+				
+//				printf(WHITE "[%d] %s", i, TaskNote[i]);
+//				LinesAdded++;
+			
+			
+//			}
+		
+//		}
+	
+//	}
+	
+	//==================================================================
+	
+	locate (1, 11);
+	printf(GREEN "Write task number >> ");
+	scanf("%d", &Opcion);
+	
+	if (Opcion <= MAX_STORAGE) {
+		
+		strcpy(TaskNote[Opcion], "");
+		TaskStatus[Opcion] = 0;
+		TaskNumber --;
+		
+		
+		printf("\nTask %d was DELETED.", Opcion);
+				
+		}
+	
+	SaveData();
+	return;
+	
+}
+	
+	
 	
 void MainMenu() {
 	
@@ -122,7 +301,7 @@ void MainMenu() {
 
 		locate(1, 3);	
 		printf(BOLD GREEN "1. Add Task");
-		printf("\n2. Show Tasks");
+		printf("\n2. Delete Task");
 		printf("\n3. Mark as Done");
 		printf("\n4. Mark as a Priority");
 		printf("\n5. Delete all Tasks");
@@ -144,8 +323,7 @@ void MainMenu() {
 				
 			case 2:
 			
-				PrintNotes();
-				WaitKey();
+				DeleteTask();
 				break;
 			
 			case 3:
@@ -211,18 +389,29 @@ printf(CLEAR_SCREEN RESET_CURSOR);
 void AddTask() {
 	
 	FlushBuffer();
-	printf("Task: ");
 	
-	// Lee hasta 100 caracteres o hasta el salto de línea
-	fgets(TaskNote[TaskNumber], MAX_CHARACTERS, stdin);
+	if (TaskNumber != MAX_STORAGE) {
+		
+		printf("Task: ");
+		
+		// Lee hasta 100 caracteres o hasta el salto de línea
+		fgets(TaskNote[TaskNumber], MAX_CHARACTERS, stdin);
 
-	if (strcmp(TaskNote[TaskNumber], "") != 0) {
-    
-		TaskStatus[TaskNumber] = 0;
-		TaskNumber ++;
-		SaveData();
-    
-	}
+		if (strcmp(TaskNote[TaskNumber], "") != 0) {
+		
+			TaskStatus[TaskNumber] = 0;
+			TaskNumber ++;
+			SaveData();
+		
+		}
+	
+	} else {
+		
+		printf(BG_BLUE WHITE "\nMAXIMUM STORAGE LIMIT! Delete some \ntasks in order to continue adding  \nnew ones."); 
+		WaitKey();
+		printf(COLOR_RESET);
+		
+		}	
 	
     return;
 		
@@ -230,42 +419,46 @@ void AddTask() {
 	
 void PrintNotes() {
 	
-	int LinesAdded = 0;
+	int LinesAdded = 1;
 	
 	printf(RESET_CURSOR);	
-	locate (40, 1);
+	locate (40, LinesAdded);
 			
 	printf(BG_RED WHITE "DO THIS FIRST:");
 	printf(COLOR_RESET);
+	
+	LinesAdded = 3;
 	
 	for (int i = 0; i < MAX_STORAGE; i ++){
 
 		if (strcmp(TaskNote[i], "") != 0) {
 				
-			locate (40, (3 + LinesAdded));
+			locate (40, (LinesAdded));
 			
 			if (TaskStatus[i] == 2) {
 				
 				printf(WHITE "[!] %s", TaskNote[i]); 
 				LinesAdded ++;
 			
-			}	
+			}
 		
 		}
 	
 	}
 	
-	LinesAdded = 0;
-	locate (40, 10);
+	LinesAdded = LinesAdded + 2;
+	locate (40, LinesAdded);
 	
 	printf(BG_BLUE WHITE "OTHER GENERAL TASKS:");
 	printf(COLOR_RESET);
+	
+	LinesAdded = LinesAdded + 2;	
 	
 	for (int i = 0; i < MAX_STORAGE; i ++){
 		
 		if (strcmp(TaskNote[i], "") != 0) {
 			
-			locate (40, (12 + LinesAdded));
+			locate (40, LinesAdded);
 			
 			if (TaskStatus[i] == 0) {
 				
@@ -278,23 +471,24 @@ void PrintNotes() {
 	
 	}	
 	
-	LinesAdded = 0;
-	locate (40, 20);
+	LinesAdded = LinesAdded + 2;
+	locate (40, LinesAdded);
 	
 	printf(BG_CYAN WHITE "DONE AND FINISHED:");
 	printf(COLOR_RESET);
+	
+	LinesAdded = LinesAdded + 2;
 	
 	for (int i = 0; i < MAX_STORAGE; i ++){
 		
 		if (strcmp(TaskNote[i], "") != 0) {
 
-			locate (40, (22 + LinesAdded));
+			locate (40, LinesAdded);
 			
 			if (TaskStatus[i] == 1) {
 				
 				printf(WHITE "[OK] %s", TaskNote[i]);
 				LinesAdded++;
-			
 			
 			}
 		
@@ -310,7 +504,7 @@ void WaitKey() {
 	
 	// Loop until a key is pressed
 	
-	printf("\n\nInput 0 and press enter to continue.");
+	printf(BG_BLACK GREEN "\n\nInput 0 and press enter to continue.");
 			
 	do {
 			
@@ -391,7 +585,7 @@ void CheckFile() {
 
 void SaveData() {
 	
-	printf("Saving...");
+	printf("\nSaving...");
 	
 	// Save the variable to a file
 	fptr = fopen("TaskList.dat", "w+");
@@ -418,21 +612,6 @@ void SaveData() {
 	for (int i= 0; i < MAX_STORAGE; i++) {fprintf(fptr, "%u ", TaskStatus[i]);}
 	fprintf(fptr, "\n"); // <--- para que las tareas empiecen en una línea nueva	
 	for (int i= 0; i < MAX_STORAGE; i++) {fprintf(fptr, "%s", TaskNote[i]);}
-    
-    //fprintf(fptr, "%f\n", GroupLessonPrice);
-    //fprintf(fptr, "%f\n", NewSinglePriceBR);
-    //fprintf(fptr, "%f\n", NewGroupPriceBR);
-    //fprintf(fptr, "%f\n", DiscountValue);
-    //fprintf(fptr, "%f\n", ArgPrice);
-    //fprintf(fptr, "%f\n", USPrice);
-    
-    //printf("Single lesson price saved: %.2f\n", SingleLessonPrice);
-    //printf("Group lesson price saved: %.2f\n", GroupLessonPrice);
-	//printf("Single lesson price for new students saved: %.2f\n", NewSinglePriceBR);
-    //printf("Group lesson price for new students saved: %.2f\n", NewGroupPriceBR);
-	//printf("Discount value saved: %.2f\n", DiscountValue);
-	//printf("Argentina's price saved: %.2f\n", ArgPrice);
-	//printf("United States price saved: %.2f\n", USPrice);
 	    
 	fclose(fptr);
 	
@@ -473,23 +652,6 @@ void Load() {
    	fgetc(fptr);
    	   		
    	for (int i= 0; i < MAX_STORAGE; i++) {fgets(TaskNote[i], MAX_CHARACTERS, fptr);}
-    
-    //fscanf(fptr, "%f", &SingleLessonPrice);
-    //fscanf(fptr, "%f", &GroupLessonPrice);
-    //fscanf(fptr, "%f", &NewSinglePriceBR);
-    //fscanf(fptr, "%f", &NewGroupPriceBR);
-    //fscanf(fptr, "%f", &DiscountValue);
-    //fscanf(fptr, "%f", &ArgPrice);
-    //fscanf(fptr, "%f", &USPrice);
-
-    //printf("Single lesson price loaded: %.2f\n", SingleLessonPrice);
-    //printf("Group lesson price loaded: %.2f\n", GroupLessonPrice);
-    //printf("Single lesson price for new students loaded: %.2f\n", NewSinglePriceBR);
-    //printf("Group lesson price for new students loaded: %.2f\n", NewGroupPriceBR);
-    //printf("Discount value loaded: %.2f\n", DiscountValue);
-    //printf("Argentina's price loaded: %.2f\n", ArgPrice);
-    //printf("United States price loaded: %.2f\n", USPrice);
-
 
 	fclose(fptr);
 	ClearScreen();
@@ -549,13 +711,7 @@ void MarkAsDone() {
 		}
 		
 	}
-	
-	//for (int i = 0; i < MAX_STORAGE; i ++) {
 		
-	//	if (TaskStatus[i] == 0 || TaskStatus[i] == 2) {printf("[%d] %s", i, TaskNote[i]);}	
-	
-	//}
-	
 	locate (40, (15 + LinesAdded));
 	printf("Write task number >> ");
 	scanf("%d", &Opcion);
@@ -568,7 +724,6 @@ void MarkAsDone() {
 		}
 	
 	SaveData();
-	//WaitKey();
 	return;
 	
 	}
@@ -651,16 +806,41 @@ void DeleteAllTasks() {
 
 void MarkAsPriority() {
 	
-	Opcion = 0;
-	printf("\n\n");
+	PrintLeftMenu();
 	
-	for (int i = 0; i < MAX_STORAGE; i ++) {
+	//==================================================================
+	
+	int LinesAdded;
+	
+	LinesAdded = 1;
+	locate (40, LinesAdded);
+	
+	printf(BG_BLUE WHITE "OTHER GENERAL TASKS:");
+	printf(COLOR_RESET);
+	
+	LinesAdded = LinesAdded + 2;	
+	
+	for (int i = 0; i < MAX_STORAGE; i ++){
 		
-		if (TaskStatus[i] == 0) {printf("[%d] %s", i, TaskNote[i]);}	
+		if (strcmp(TaskNote[i], "") != 0) {
+			
+			locate (40, LinesAdded);
+			
+			if (TaskStatus[i] == 0) {
+				
+				printf(WHITE "[%d] %s", i, TaskNote[i]);
+				LinesAdded ++;	
+			
+			}
+			
+		}
 	
-	}
+	}	
 	
-	printf("\n\nWhat task do you want to mark as A PRIORITY? >> ");
+	//==================================================================
+		
+	locate (40, (LinesAdded + 2));
+	printf("What task do you want to mark as A PRIORITY? >> ");
 	scanf("%d", &Opcion);
 	
 	if (Opcion <= MAX_STORAGE) {
@@ -671,7 +851,6 @@ void MarkAsPriority() {
 		}
 	
 	SaveData();
-	WaitKey();
 	return;
 	
 	}
@@ -720,7 +899,13 @@ void PrintLeftMenu() {
 //TO DO
 //=====
 
-
+// - Agregar automaticamente fecha y hora a las tareas.
+// - Hacer una papelera de reciclage en donde se puedan almacenar tareas borradas.
+// - Que se pueda vaciar la papelera de reciclage.
+// - Que se puedan restaurar tareas de la papelera de reciclage.
+// - Avisar cuando se alcance el limite de almacenamiento de tareas.
+// - Extender limite de almacenamiento de tareas.
+// - Todavía hay un BUG en la carga de los datos.
 
 //======================================================================
 
