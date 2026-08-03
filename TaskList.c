@@ -9,7 +9,7 @@
 
 #endif
 
-#define MAX_STORAGE 20
+#define MAX_STORAGE 50
 #define MAX_CHARACTERS 300
 
 // Definimos los códigos ANSI como macros para poder usarlos como LOCATE.
@@ -74,7 +74,8 @@ void clean_screen();
 FILE *fptr; // Declares the file pointer globally
 
 char TaskNote [MAX_STORAGE][MAX_CHARACTERS];
-//int TaskStatus[MAX_STORAGE]; 
+
+//STATUS 1: DONE | STATUS 2: PRIORITY | STATUS 3: RECYCLE BIN
 unsigned char TaskStatus[MAX_STORAGE]; 
 
 
@@ -102,6 +103,8 @@ void DeleteFiles();
 void DeleteAllTasks();
 void MarkAsPriority();
 void ShowDate();
+void RecycleBin();
+void ShowVariables();
 
 int main() {
 		
@@ -109,6 +112,140 @@ int main() {
 		MainMenu();
 			
 	}
+	
+void RecycleBin() {
+	
+	RecycleBinIni:
+	
+	ClearScreen();
+
+	// Dibujamos una especie de interfaz
+		
+	locate(2, 1);
+	printf(COLOR_BOLD BG_GREEN WHITE "=== GESTOR DE TAREAS v0.2 ===" COLOR_RESET);
+	
+	//ClearScreen();
+
+	locate(1, 3);	
+	printf(BOLD GREEN "1. Delete a Task");
+	printf("\n2. Empty Recycle Bin");
+	printf("\n7. Exit");
+	
+	int LinesAdded = 1;
+	
+	printf(RESET_CURSOR);	
+	locate (40, LinesAdded);
+			
+	printf(BG_BLUE WHITE "RECYCLE BIN:");
+	printf(COLOR_RESET);
+	
+	LinesAdded = 3;
+	
+	for (int i = 0; i < MAX_STORAGE; i ++){
+
+		if (strcmp(TaskNote[i], "") != 0) {
+				
+			locate (40, (LinesAdded));
+			
+			if (TaskStatus[i] == 3) {
+				
+				printf(WHITE "[%d] %s", i, TaskNote[i]);
+				LinesAdded ++;
+			
+			}
+		
+		}
+	
+	}
+		
+		locate(1, 11);
+		printf(B_GREEN "Choose an option: ");
+		scanf("%d", &Opcion);
+		
+		switch (Opcion) {
+			
+			case 1: 
+			
+				//======================================================================
+	
+				locate (1, 11);
+				printf(GREEN "Write task number >> ");
+				scanf("%d", &Opcion);
+		
+				if (Opcion <= MAX_STORAGE && TaskStatus[Opcion] == 3) {
+			
+					strcpy(TaskNote[Opcion], "");
+					TaskStatus[Opcion] = 0;
+					TaskNumber --;
+			
+					printf("\nTask %d was eliminated from RECYCLE BIN.", Opcion);
+					SaveData();
+					WaitKey();
+					
+				} else { 
+					
+					locate (1, 12); 
+					printf(GREEN "[X] Invalid Entry!");
+					WaitKey();
+				
+				}
+				
+				
+					
+				break;
+			
+			case 2:
+			
+				printf("\n");
+				printf ("Are you sure you want to empty the recycle bin? \n");
+				printf("Write YES to confirm the action: ");
+				scanf("%4s", &UserInput0);
+							
+				if (strcasecmp(UserInput0, "YES") == 0) {
+					
+					for (int i = 0; i < MAX_STORAGE; i++) {
+						
+						if (TaskStatus[i] == 3) {
+						
+							strcpy(TaskNote[i], "");
+							TaskStatus[i] = 0;
+							TaskNumber --;
+						
+						}
+								
+					}
+					
+					printf("\n");
+					printf("The recycle bin has been emptied. ");
+					printf("\n");
+					
+				} else {
+						
+					printf("\n"); 
+					printf("The action ha been canceled...");
+						
+					}
+				
+				WaitKey();
+				break;
+			
+			case 7: 
+			
+				break;
+				
+			default:
+			
+					goto RecycleBinIni;
+					break;					
+			
+			}
+	
+	if (Opcion != 7) {goto RecycleBinIni;}
+
+}
+	
+	
+
 
 void ShowDate() {
 	
@@ -225,97 +362,23 @@ void DeleteTask() {
 	
 	}
 
-
 //======================================================================
-	
-//	int LinesAdded = 0;
-	
-//	printf(RESET_CURSOR);	
-//	locate (40, 1);
-			
-//	printf(BG_RED WHITE "DO THIS FIRST:");
-//	printf(COLOR_RESET);
-	
-//	for (int i = 0; i < MAX_STORAGE; i ++){
-
-//		if (strcmp(TaskNote[i], "") != 0) {
-				
-//			locate (40, (3 + LinesAdded));
-			
-//			if (TaskStatus[i] == 2) {
-				
-//				printf(WHITE "[%d] %s", i, TaskNote[i]);
-//				LinesAdded ++;
-			
-//			}	
-		
-//		}
-	
-//	}
-	
-//	LinesAdded = 0;
-//	locate (40, 10);
-//	
-//	printf(BG_BLUE WHITE "OTHER GENERAL TASKS:");
-//	printf(COLOR_RESET);
-	
-//	for (int i = 0; i < MAX_STORAGE; i ++){
-		
-//		if (strcmp(TaskNote[i], "") != 0) {
-			
-//			locate (40, (12 + LinesAdded));
-			
-//			if (TaskStatus[i] == 0) {
-				
-//				printf(WHITE "[%d] %s", i, TaskNote[i]);
-//				LinesAdded ++;	
-//			
-//			}
-			
-//		}
-	
-//	}	
-	
-//	LinesAdded = 0;
-//	locate (40, 20);
-	
-//	printf(BG_CYAN WHITE "DONE AND FINISHED:");
-//	printf(COLOR_RESET);
-	
-//	for (int i = 0; i < MAX_STORAGE; i ++){
-		
-//		if (strcmp(TaskNote[i], "") != 0) {
-
-//			locate (40, (22 + LinesAdded));
-			
-//			if (TaskStatus[i] == 1) {
-				
-//				printf(WHITE "[%d] %s", i, TaskNote[i]);
-//				LinesAdded++;
-			
-			
-//			}
-		
-//		}
-	
-//	}
-	
-	//==================================================================
 	
 	locate (1, 11);
 	printf(GREEN "Write task number >> ");
 	scanf("%d", &Opcion);
 	
-	if (Opcion <= MAX_STORAGE) {
+	//if (Opcion <= MAX_STORAGE) {
 		
-		strcpy(TaskNote[Opcion], "");
-		TaskStatus[Opcion] = 0;
-		TaskNumber --;
+	//	strcpy(TaskNote[Opcion], "");
+	//	TaskStatus[Opcion] = 0;
+	//	TaskNumber --;
 		
-		
-		printf("\nTask %d was DELETED.", Opcion);
+	TaskStatus[Opcion] = 3;
+	//TaskNumber --;
+	printf("\nTask %d was sent to the RECYCLE BIN.", Opcion);
 				
-		}
+	//	}
 	
 	SaveData();
 	return;
@@ -330,7 +393,7 @@ void MainMenu() {
 	
 	do {
 		
-		clean_screen();
+		ClearScreen();
 		ShowDate();
 
 		// Dibujamos una especie de interfaz
@@ -347,7 +410,8 @@ void MainMenu() {
 		printf("\n4. Mark as a Priority");
 		printf("\n5. Delete all Tasks");
 		printf("\n6. Delete Files");
-		printf("\n7. Exit");
+		printf("\n7. Recycle Bin");
+		printf("\n8. Exit");
 		
 		PrintNotes();
 		
@@ -386,13 +450,23 @@ void MainMenu() {
 			
 				DeleteFiles();
 				break;
-			
+				
 			case 7:
+			
+				RecycleBin();
+				break;
+			
+			case 8:
 				
 				printf("Ending program...");
 				printf(COLOR_RESET);	
 				loop1 = 7;
 				ClearScreen();
+				break;
+				
+			case 555:
+			
+				ShowVariables();
 				break;
 			
 			default:
@@ -411,19 +485,19 @@ void MainMenu() {
 
 void ClearScreen() {
 
-printf(CLEAR_SCREEN RESET_CURSOR);
+//printf(CLEAR_SCREEN RESET_CURSOR);
 
-//#ifdef _WIN32
+#ifdef _WIN32
     
-    // Windows
-//    system("cls");
+    //Windows
+	system("cls");
 
-//#else
+#else
     
-    // Unix-like systems
-//    system("clear");
+	//Unix-like systems
+	system("clear");
 
-//#endif
+#endif
 
 }
 	
@@ -833,6 +907,8 @@ void DeleteAllTasks() {
 		printf("All tasks have been deleted. ");
 		printf("\n");
 		
+		TaskNumber = 0;
+		
 	} else {
 			
 		printf("\n"); 
@@ -914,7 +990,7 @@ void clean_screen() {
 
 void PrintLeftMenu() {
 	
-	clean_screen();
+	ClearScreen();
 
 	// Dibujamos una especie de interfaz
 		
@@ -935,6 +1011,24 @@ void PrintLeftMenu() {
 	
 	}
 
+
+//SEGUIR CON ESTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+	
+void ShowVariables() {
+	
+	printf("TaskNumber: %d", TaskNumber);
+	
+	WaitKey();
+	
+	
+	
+	
+	
+	
+	
+	
+	}
+
 //NOTES
 
 //TO DO
@@ -947,20 +1041,16 @@ void PrintLeftMenu() {
 //   tareas guardadas, etc. 
 // - Agregar FECHA en la parte suoerior del programa.
 // - Agregar automaticamente fecha y hora a las tareas.
-// - Hacer una papelera de reciclage en donde se puedan almacenar tareas borradas.
-// - Que se pueda vaciar la papelera de reciclage.
+
 // - Que se puedan restaurar tareas de la papelera de reciclage.
 
-// - Extender limite de almacenamiento de tareas.
 // - Todavía hay un BUG en la carga de los datos.
+// - Cuando hay muchas tareas no se ve el titulo de "Marked as DONE" (bug). Reparar.
 
 //======================================================================
 
 // Version 0.2
 //============
-
-// - Nuevo nombre para el programa podría ser "FG TaskList".
-// * Avisar cuando se alcance el limite de almacenamiento de tareas. [OK]
 
 // * Optimized Memory: Switched TaskStatus from 'int' to 'unsigned char' (75% RAM savings per status).
 // * Processing Efficiency: Removed system() calls, replaced with direct ANSI escape sequences for instant UI rendering.
@@ -972,6 +1062,12 @@ void PrintLeftMenu() {
 // * Non-Linear Rendering: Utilized coordinate-based positioning (locate function) to create a multi-column dashboard layout.
 // * Visual Feedback System: Implemented status-specific prefixes ([!], *, [OK]) and color coding for better task tracking.
 // * Cross-Platform Compatibility: Fully portable terminal handling for modern Windows, Linux, and macOS environments.
+// * Avisar cuando se alcance el limite de almacenamiento de tareas. [OK]
+// - Nuevo nombre para el programa podría ser "FG TaskList".
+// - Hacer una papelera de reciclage en donde se puedan almacenar tareas borradas.[OK]
+// - Que se pueda vaciar la papelera de reciclage.[OK]
+// - Extender limite de almacenamiento de tareas. EXTENDIDO A 50 TAREAS [OK]
+
 
 // Version 0.1
 //============
