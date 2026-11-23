@@ -254,7 +254,7 @@ void ShowDate() {
 	time_t now = time(NULL);         // Get current time
 	struct tm *t = localtime(&now);  // Convert to local time structure
 	
-	locate (112, 1);
+	locate (111, 1);
 	
 	switch (Language) {
 		
@@ -263,12 +263,14 @@ void ShowDate() {
 			printf("%d/", t->tm_mon + 1);
 			printf("%d/", t->tm_mday);
 			printf("%d", t->tm_year + 1900);
+			break;
 
 		case 1:
 
 			printf("%d/", t->tm_mday);		
 			printf("%d/", t->tm_mon + 1);
 			printf("%d", t->tm_year + 1900);
+			break;
 		
 	}
 	
@@ -362,25 +364,31 @@ void DeleteTask() {
 	
 	}
 
-//======================================================================
+//====================================================================== [CORRIGIENDO]
 	
 	locate (1, 11);
 	printf(GREEN "Write task number >> ");
-	scanf("%d", &Opcion);
 	
-	//if (Opcion <= MAX_STORAGE) {
-		
-	//	strcpy(TaskNote[Opcion], "");
-	//	TaskStatus[Opcion] = 0;
-	//	TaskNumber --;
-		
-	TaskStatus[Opcion] = 3;
-	//TaskNumber --;
-	printf("\nTask %d was sent to the RECYCLE BIN.", Opcion);
-				
-	//	}
+	if (scanf("%d", &Opcion) != 1) {
 	
-	SaveData();
+		FlushBuffer();
+		Opcion = -1;
+	
+	}
+	
+	if (Opcion >= 0 && Opcion <= MAX_STORAGE - 1 && strcmp(TaskNote[Opcion], "") != 0 && TaskStatus[Opcion] != 3) {
+		
+		TaskStatus[Opcion] = 3;
+		printf("\nTask %d was sent to the RECYCLE BIN.", Opcion);
+		SaveData();
+		
+	} else {
+		
+		printf("\n[X] Invalid task number!");
+		WaitKey();
+		
+	}
+		
 	return;
 	
 }
@@ -515,9 +523,9 @@ void AddTask() {
 		if (strcmp(TaskNote[TaskNumber], "") != 0) {
 		
 			TaskStatus[TaskNumber] = 0;
-			TaskNumber ++;
 			SaveData();
-		
+			TaskNumber ++;
+				
 		}
 	
 	} else {
@@ -719,25 +727,32 @@ void SaveData() {
     
     fprintf(fptr, "%d\n", TaskNumber);
     
-    //printf("Config: Time Difference MODE [%d]\n", TimeDifferenceMODE);
-    
-    //Values and Prices
+    // Values and Prices
     //=================
 
-	for (int i= 0; i < MAX_STORAGE; i++) {fprintf(fptr, "%u ", TaskStatus[i]);}
+	for (int i = 0; i < MAX_STORAGE; i++) {
+		fprintf(fptr, "%u ", TaskStatus[i]);
+	}
 	fprintf(fptr, "\n"); // <--- para que las tareas empiecen en una línea nueva	
-	for (int i= 0; i < MAX_STORAGE; i++) {fprintf(fptr, "%s", TaskNote[i]);}
+	
+	for (int i = 0; i < MAX_STORAGE; i++) {
+		char cleanNote[MAX_CHARACTERS];
+		strncpy(cleanNote, TaskNote[i], MAX_CHARACTERS);
+		cleanNote[MAX_CHARACTERS - 1] = '\0';
+		cleanNote[strcspn(cleanNote, "\r\n")] = '\0';
+		fprintf(fptr, "%s\n", cleanNote);
+	}
 	    
 	fclose(fptr);
 	
-	}
+}
 	
 // LOAD Function
 void Load() {
 	
 	printf("Loading...");
 	
-	 fptr = fopen("TaskList.dat", "r");
+	fptr = fopen("TaskList.dat", "r");
 	
     // Load the variable from the file
 	
@@ -751,22 +766,33 @@ void Load() {
     // Read variables from the file
     //==================================================================
     
-    
     // Config variables
     //=================
 
-    fscanf(fptr, "%d", &TaskNumber);
-    //printf("Config: Time Difference MODE loaded [%d]\n", TimeDifferenceMODE);
+    if (fscanf(fptr, "%d", &TaskNumber) != 1) {
+    	TaskNumber = 0;
+    }
   
-    //Tasks, TO DO list.
+    // Tasks, TO DO list.
     //==================  
 
-   	for (int i= 0; i < MAX_STORAGE; i++) {fscanf(fptr, "%hhu", &TaskStatus[i]);} 
+   	for (int i = 0; i < MAX_STORAGE; i++) {
+   		if (fscanf(fptr, "%hhu", &TaskStatus[i]) != 1) {
+   			TaskStatus[i] = 0;
+   		}
+   	} 
    	
-   	// FGETC(FPTR): Consume el último espacio o salto de línea que dejó el fscanf.
-   	fgetc(fptr);
+   	// Consume todo lo que quede hasta el salto de línea tras los estados
+   	int ch;
+   	while ((ch = fgetc(fptr)) != '\n' && ch != EOF) {}
    	   		
-   	for (int i= 0; i < MAX_STORAGE; i++) {fgets(TaskNote[i], MAX_CHARACTERS, fptr);}
+   	for (int i = 0; i < MAX_STORAGE; i++) {
+   		if (fgets(TaskNote[i], MAX_CHARACTERS, fptr) != NULL) {
+   			TaskNote[i][strcspn(TaskNote[i], "\r\n")] = '\0';
+   		} else {
+   			TaskNote[i][0] = '\0';
+   		}
+   	}
 
 	fclose(fptr);
 	ClearScreen();
@@ -1039,19 +1065,30 @@ void ShowVariables() {
 // - Agregar apartado en donde se puedan ver los valores de las variables 
 //   del programa, en donde se vea la capacidad de memoria del sistema, cantidad de
 //   tareas guardadas, etc. 
-// - Agregar FECHA en la parte suoerior del programa.
 // - Agregar automaticamente fecha y hora a las tareas.
-
 // - Que se puedan restaurar tareas de la papelera de reciclage.
-
 // - Todavía hay un BUG en la carga de los datos.
 // - Cuando hay muchas tareas no se ve el titulo de "Marked as DONE" (bug). Reparar.
+// - Que se puedan clasificar las tareas en nivel de prioridad 1, 2 y 3.
 
 //======================================================================
+
+
+// Version 0.3
+//============
+
+// * Corregido bug en SaveData() y Load(): drenaje completo del salto de línea tras leer estados y 
+//   limpieza de '\r\n' con strcspn para evitar desfase de datos al cargar.
+// * Validación estricta de límites de arreglo (0 a MAX_STORAGE - 1) en DeleteTask() para evitar accesos fuera de rango.
+// * Verificación de tareas existentes y estado activo (TaskStatus != 3) antes de enviar a la papelera de reciclaje en 
+//   DeleteTask().
+// * Validación de entrada numérica en scanf() con limpieza de búfer mediante FlushBuffer() en DeleteTask().
+// * Guardado condicional en SaveData() ejecutado únicamente cuando la operación sobre la tarea es válida.
 
 // Version 0.2
 //============
 
+// * Agregar FECHA en la parte superior del programa.
 // * Optimized Memory: Switched TaskStatus from 'int' to 'unsigned char' (75% RAM savings per status).
 // * Processing Efficiency: Removed system() calls, replaced with direct ANSI escape sequences for instant UI rendering.
 // * Robust Persistence: Implemented safe loading with '%hhu' and manual buffer clearing (fgetc) to prevent data corruption.
