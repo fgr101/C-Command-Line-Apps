@@ -2,6 +2,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <stdlib.h> 
+#include <strings.h>
 
 #ifdef _WIN32
 
@@ -105,6 +107,9 @@ void MarkAsPriority();
 void ShowDate();
 void RecycleBin();
 void ShowVariables();
+void SleepOneSec();
+
+int ReadTaskOrExitCommand(int col, int row);
 
 int main() {
 		
@@ -424,7 +429,7 @@ void MainMenu() {
 		PrintNotes();
 		
 		locate(1, 11);
-		printf(B_GREEN "Choose an option: ");
+		printf(B_GREEN "\nChoose an option: ");
 		scanf("%d", &Opcion);
 		
 		switch (Opcion) {
@@ -683,6 +688,7 @@ void CheckFile() {
 			
 			fptr = fopen(filename, "w+");
 			printf("File does not exist. New file created. \n");
+			SleepOneSec();
 			fclose(fptr);
 		
 		}
@@ -693,6 +699,7 @@ void CheckFile() {
 	{
 		
 		printf("Error opening the file.\n");
+		SleepOneSec();
 		return; // indicate an error to the operating system
 
 	}
@@ -716,6 +723,7 @@ void SaveData() {
 	if (fptr == NULL) {
 		
 		printf("Error opening file!\n");
+		SleepOneSec();
 		return;
 	}
 
@@ -759,6 +767,7 @@ void Load() {
 	if (fptr == NULL) {
 		
 		printf("Error opening file!\n");
+		SleepOneSec();
     	return;
 
 	}
@@ -800,6 +809,8 @@ void Load() {
 }
 
 void MarkAsDone() {
+	
+	MarkAsDoneIni:
 	
 	ClearScreen();
 	PrintLeftMenu();
@@ -853,21 +864,43 @@ void MarkAsDone() {
 		
 	}
 		
-	locate (40, (15 + LinesAdded));
-	printf("Write task number >> ");
-	scanf("%d", &Opcion);
+	int result = ReadTaskOrExitCommand(40, 15 + LinesAdded);
+
+	if (result == -1) {
 	
-	if (Opcion <= MAX_STORAGE) {
-		
-		TaskStatus[Opcion] = 1; // STATUS 1 means DONE.
-		printf("Task %d marked as finished.", Opcion);
-				
-		}
+		return;
+	}
+
+	if (result == -2) {
 	
-	SaveData();
-	return;
+		locate(40, 18 + LinesAdded);
+		printf("[X] Invalid task number or command!");
+		WaitKey();
+		goto MarkAsDoneIni;
 	
 	}
+
+	Opcion = result;
+
+	if (strcmp(TaskNote[Opcion], "") != 0 && TaskStatus[Opcion] != 3) {
+	
+		TaskStatus[Opcion] = 1; // STATUS 1 means DONE.
+		locate(40, 18 + LinesAdded);
+		printf("Task %d marked as finished.", Opcion);
+		SleepOneSec();
+		SaveData();
+	
+	} else {
+	
+		locate(40, 18 + LinesAdded);
+		printf("[X] Invalid task number!");
+		WaitKey();
+	
+	}
+
+	goto MarkAsDoneIni;
+		
+}
 	
 void DeleteFiles() {
 	
@@ -990,6 +1023,7 @@ void MarkAsPriority() {
 		
 		TaskStatus[Opcion] = 2; // STATUS 2 means PRIORITY.
 		printf("Task %d marked as important and a priority.", Opcion);
+		SleepOneSec();
 		
 		}
 	
@@ -1037,23 +1071,57 @@ void PrintLeftMenu() {
 	
 	}
 
-
 //SEGUIR CON ESTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 	
 void ShowVariables() {
 	
 	printf("TaskNumber: %d", TaskNumber);
 	
-	WaitKey();
-	
-	
-	
-	
-	
-	
-	
+	WaitKey();	
 	
 	}
+	
+void SleepOneSec() {
+	
+#ifdef _WIN32
+
+    Sleep(1000); // 1000 ms = 1 segundo
+
+#else
+
+    fflush(stdout);
+    sleep(1);    // 1 segundo
+
+#endif
+
+}
+
+int ReadTaskOrExitCommand(int col, int row) {
+    char entry[32];
+
+    locate(col, row);
+    printf("Write task number >> ");
+
+    if (scanf("%31s", entry) != 1) {
+        FlushBuffer();
+        return -2;
+    }
+
+    if (strcasecmp(entry, "ok") == 0 ||
+        strcasecmp(entry, "done") == 0 ||
+        strcasecmp(entry, "end") == 0) {
+        return -1;
+    }
+
+    char *endPtr = NULL;
+    long num = strtol(entry, &endPtr, 10);
+
+    if (*endPtr != '\0' || num < 0 || num >= MAX_STORAGE) {
+        return -2;
+    }
+
+    return (int)num;
+}
 
 //NOTES
 
@@ -1067,6 +1135,8 @@ void ShowVariables() {
 //   tareas guardadas, etc. 
 // - Agregar automaticamente fecha y hora a las tareas.
 // - Que se puedan restaurar tareas de la papelera de reciclage.
+// - Que se puedan editar las tareas.
+// - Sistema de TAGS para organizar las tareas.
 // - Todavía hay un BUG en la carga de los datos.
 // - Cuando hay muchas tareas no se ve el titulo de "Marked as DONE" (bug). Reparar.
 // - Que se puedan clasificar las tareas en nivel de prioridad 1, 2 y 3.
